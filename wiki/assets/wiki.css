@@ -1,0 +1,1310 @@
+/* Call of Boba / 啵啵鸡物语 Wiki. Same palette, heading font family, 9-slice frames and day/night lamp as the
+   main site (site/assets/css/site.css). No external requests; all paths relative to this file. */
+@font-face {
+  font-family: "CobWikiHead";
+  src: url(fonts/wiki-head.woff2) format("woff2");
+  font-display: swap;
+}
+
+:root {
+  --hud-h: 56px;
+  --body: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --head: "CobWikiHead", var(--body);
+  --btn-ink: #4f0230;
+  --card-ink: #fff8ee;
+  --box: #514545;
+}
+html[lang="en"] {
+  --body: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+}
+html[data-time="day"] {
+  --bg: #f6eedd; --ink: #3b2a20; --ink2: #634836; --accent: #8a4f25; --mark: #ffd98a;
+  --link: #7a3a12; --focus: #1f4fbf; --tile: rgba(255, 252, 244, .75); --tile-line: #d9c6a3;
+  --tile-on: #fff3cf; --hud-bg: rgba(77, 66, 66, .95); --row: rgba(138, 79, 37, .06); --water: #5d9ad0;
+  color-scheme: light;
+}
+html[data-time="night"] {
+  --bg: #231239; --ink: #f3ebdd; --ink2: #cdbfe2; --accent: #ffc870; --mark: #5b3f8e;
+  --link: #ffd98f; --focus: #ffd98f; --tile: rgba(255, 255, 255, .07); --tile-line: #4b3672;
+  --tile-on: rgba(255, 200, 112, .18); --hud-bg: rgba(14, 7, 28, .95); --row: rgba(255, 255, 255, .04); --water: #6fb0e8;
+  color-scheme: dark;
+}
+
+/* ---------------------------------------------------------------- language pairs (spec §1) */
+html[data-lang="zh"] [lang="en"], html[data-lang="en"] [lang="zh"] { display: none !important; }
+html[data-lang="zh"] .to-zh, html[data-lang="en"] .to-en { display: none; }
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { background: var(--bg); scroll-padding-top: calc(var(--hud-h) + 12px); -webkit-text-size-adjust: 100%; }
+body { margin: 0; color: var(--ink); font: 16px/1.7 var(--body); overflow-x: hidden; }
+body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; background: var(--bg); }
+html[data-time="night"] body::before { background: linear-gradient(180deg, #231239 0%, #150b30 55%, #00001e 100%); }
+h1, h2, h3, .f-head, [role="tab"] { font-family: var(--head); font-weight: normal; line-height: 1.3; }
+h1 { font-size: 34px; margin: 6px 0 14px; }
+h2 { font-size: 25px; margin: 30px 0 12px; }
+h3 { font-size: 19px; margin: 18px 0 8px; }
+p { margin: 0 0 10px; }
+a { color: var(--link); text-underline-offset: 3px; }
+a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible, [tabindex]:focus-visible {
+  outline: 3px solid var(--focus); outline-offset: 2px;
+}
+img { max-width: 100%; }
+.px { image-rendering: pixelated; }
+.sr-only { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+.skip { position: fixed; left: 12px; top: -80px; z-index: 100; padding: 10px 16px; background: #fff; color: #3b2a20; border-radius: 4px; }
+.skip:focus { top: 8px; }
+.note { color: var(--ink2); font-size: 14px; }
+.lead { color: var(--ink2); font-size: 17px; }
+
+/* ---------------------------------------------------------------- icons (atlas positions are generated) */
+.ic {
+  --s: var(--k2, 1);
+  display: inline-block; flex: none; vertical-align: middle;
+  width: calc(var(--w) * var(--s) * 1px); height: calc(var(--h) * var(--s) * 1px);
+  background-repeat: no-repeat;
+  background-size: calc(var(--aw) * var(--s) * 1px) calc(var(--ah) * var(--s) * 1px);
+  background-position: calc(var(--x) * var(--s) * -1px) calc(var(--y) * var(--s) * -1px);
+  image-rendering: pixelated;
+}
+.ic.s-sm { --s: var(--k1, 1); }
+.ic.s-lg { --s: var(--k3, 1); }
+
+/* ---------------------------------------------------------------- 9-slice frames from the game */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 48px; padding: 0 14px; margin: 0;
+  border-style: solid; border-width: 8px 8px 16px 8px; border-color: transparent;
+  border-image: url(ui_button_0_x4.png) 8 8 16 8 fill / 8px 8px 16px 8px / 0 stretch;
+  image-rendering: pixelated; background: none;
+  color: var(--btn-ink); font: 18px/1.2 var(--head); text-decoration: none; text-align: center; cursor: pointer;
+}
+.btn-primary { border-image-source: url(ui_button_1_x4.png); }
+.btn:hover, .btn:focus-visible { border-image-source: url(ui_button_2_x4.png); }
+
+/* ---------------------------------------------------------------- HUD header */
+.hud {
+  position: fixed; top: 0; left: 0; right: 0; height: var(--hud-h); z-index: 50;
+  display: flex; align-items: center; gap: 12px;
+  padding: 0 max(12px, env(safe-area-inset-right)) 0 max(10px, env(safe-area-inset-left));
+  background: var(--hud-bg); color: #fff;
+}
+.hud a { color: #fff; }
+.hud-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; flex: none; }
+.hud-logo .f-head { font-size: 18px; }
+.hud-wiki { font-size: 18px; padding: 4px 10px; border: 2px solid rgba(255, 255, 255, .35); border-radius: 6px; text-decoration: none; flex: none; }
+.hud-wiki:hover, .hud-logo:hover { color: #ffe1a6; }
+.hud .search { flex: 1 1 auto; max-width: 440px; margin-left: auto; }
+.hud-lang { font-size: 16px; padding: 12px 4px; text-decoration: underline; text-underline-offset: 4px; flex: none; }
+.hud-lang:hover { color: #ffe1a6; }
+.lamp { position: relative; flex: none; width: 34px; height: 50px; padding: 0; margin: 0 2px 0 0; border: 0; background: none; cursor: pointer; }
+.lamp .lamp-body { position: absolute; left: 6px; top: 2px; }
+.lamp .lamp-light { position: absolute; left: -3px; top: -6px; pointer-events: none; transition: opacity .3s; }
+html[data-time="night"] .lamp .lamp-light { opacity: 0; }
+html[data-time="night"] .lamp .lamp-body { filter: brightness(.62); }
+.lamp:hover .lamp-body { filter: drop-shadow(1px 0 0 #fff) drop-shadow(-1px 0 0 #fff) drop-shadow(0 1px 0 #fff) drop-shadow(0 -1px 0 #fff); }
+
+/* ---------------------------------------------------------------- search */
+.search { position: relative; }
+.search input {
+  width: 100%; height: 38px; padding: 0 12px; border: 2px solid rgba(255, 255, 255, .4); border-radius: 6px;
+  background: rgba(255, 255, 255, .12); color: #fff; font: 15px/1 var(--body);
+}
+.search input::placeholder { color: rgba(255, 255, 255, .72); }
+.search-big input { height: 48px; font-size: 17px; border-color: var(--tile-line); background: var(--tile); color: var(--ink); }
+.search-big input::placeholder { color: var(--ink2); }
+.q-res {
+  position: absolute; left: 0; right: 0; top: calc(100% + 4px); z-index: 60; margin: 0; padding: 4px; list-style: none;
+  max-height: min(70vh, 520px); overflow-y: auto; border-radius: 6px;
+  background: var(--bg); color: var(--ink); border: 2px solid var(--tile-line); box-shadow: 0 8px 24px rgba(0, 0, 0, .3);
+}
+.q-res li { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: 4px; cursor: pointer; }
+.q-res li[aria-selected="true"], .q-res li:hover { background: var(--tile-on); }
+.q-res .qk { margin-left: auto; color: var(--ink2); font-size: 13px; }
+.q-res .qn { flex: 1 1 auto; min-width: 0; }
+.q-res .qempty { color: var(--ink2); cursor: default; }
+
+/* ---------------------------------------------------------------- layout */
+main.wrap { position: relative; max-width: 1160px; margin: 0 auto; padding: calc(var(--hud-h) + 14px) 24px 40px; }
+.crumbs ol { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 0; font-size: 14px; color: var(--ink2); }
+.crumbs li + li::before { content: "›"; margin: 0 8px; color: var(--ink2); }
+.pt { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.top { margin-bottom: 8px; }
+.sec { clear: none; }
+.sec > h2 { padding-bottom: 4px; border-bottom: 2px solid var(--tile-line); }
+.navbox, .foot { clear: both; }
+blockquote.gdesc {
+  margin: 0 0 16px; padding: 10px 16px; max-width: 44em; border-left: 4px solid var(--accent);
+  background: var(--tile); border-radius: 0 6px 6px 0; color: var(--ink); font-size: 16px;
+}
+blockquote.gdesc p { margin: 0; }
+
+/* ---------------------------------------------------------------- chips */
+.chip {
+  display: inline-flex; align-items: center; gap: 6px; max-width: 100%;
+  padding: 2px 9px 2px 4px; margin: 2px 6px 2px 0; min-height: 34px;
+  border: 2px solid var(--tile-line); border-radius: 6px; background: var(--tile);
+  color: var(--ink); text-decoration: none; line-height: 1.25; vertical-align: middle;
+}
+a.chip { color: var(--link); }
+a.chip:hover { border-color: var(--accent); background: var(--tile-on); }
+.chip .cn { overflow-wrap: anywhere; }
+.chip .qty, .qty { color: var(--ink2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.chip-sm { min-height: 26px; padding: 1px 7px 1px 3px; gap: 4px; font-size: 14px; }
+.chip-lg { min-height: 56px; font-size: 18px; }
+.chip-season { padding-left: 9px; border-left-width: 6px; }
+.chips { display: inline-flex; flex-wrap: wrap; align-items: center; }
+p.chips { display: flex; }
+.m { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.tag { display: inline-block; padding: 0 7px; margin: 1px 4px 1px 0; border-radius: 4px; border: 1px solid var(--tile-line); font-size: 13px; color: var(--ink2); white-space: nowrap; }
+a.tag-link { text-decoration: none; }
+.badge { display: inline-block; padding: 0 6px; margin-left: 4px; border-radius: 4px; background: var(--accent); color: var(--bg); font-size: 12px; vertical-align: middle; }
+.arrow { margin: 0 6px 0 0; color: var(--ink2); }
+.measure { color: var(--ink2); }
+
+/* ---------------------------------------------------------------- infobox: the game's dialog box */
+.infobox {
+  float: right; width: 330px; margin: 0 0 18px 24px; padding: 8px 12px 10px;
+  border: 12px solid transparent; border-image: url(ui_textbox.png) 12 fill / 12px / 0 stretch;
+  background: var(--box) padding-box; image-rendering: pixelated; color: var(--card-ink);
+}
+.infobox .ib-cap { font-size: 18px; text-align: center; margin-bottom: 6px; }
+.infobox .ib-art { display: flex; justify-content: center; align-items: center; gap: 10px; padding: 6px 0 10px; }
+.infobox .ib-art img { display: block; }
+table.ib { width: 100%; border-collapse: collapse; font-size: 15px; }
+table.ib th { text-align: left; font-weight: normal; color: #e8d6bf; padding: 5px 8px 5px 0; vertical-align: top; white-space: nowrap; width: 1%; }
+table.ib td { padding: 5px 0; vertical-align: top; }
+table.ib tr + tr th, table.ib tr + tr td { border-top: 1px solid rgba(255, 255, 255, .14); }
+.infobox a { color: #ffe1a6; }
+.infobox .chip { background: rgba(255, 255, 255, .08); border-color: rgba(255, 255, 255, .28); color: var(--card-ink); }
+.infobox a.chip { color: #ffe1a6; }
+.infobox .note, .infobox .qty { color: #e3d2bd; }
+.infobox .tag { color: #f1e3cf; border-color: rgba(255, 255, 255, .35); }
+table.kv { max-width: 480px; }
+.sec table.kv { background: var(--box); color: var(--card-ink); border-radius: 6px; }
+.sec table.kv th, .sec table.kv td { padding: 6px 12px; }
+.sec table.kv .note { color: #e3d2bd; }
+
+/* ---------------------------------------------------------------- tables */
+.tcount { margin: 6px 0 4px; font-size: 14px; color: var(--ink2); }
+.tbl-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; margin: 0 0 18px; border: 2px solid var(--tile-line); border-radius: 6px; }
+table.wt { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 15px; }
+.wt th, .wt td { padding: 7px 10px; text-align: left; vertical-align: middle; border-bottom: 1px solid var(--tile-line); }
+.wt tbody tr:last-child > * { border-bottom: 0; }
+.wt thead th { background: var(--tile-on); font-weight: 600; white-space: nowrap; font-size: 14px; position: sticky; top: 0; }
+.wt tbody th { font-weight: normal; }
+.wt tbody tr:nth-child(even) > * { background: var(--row); }
+.wt td.z { color: var(--ink2); text-align: center; }
+.wt .nw { white-space: nowrap; }
+.wt td[data-v], .wt th[data-num] { font-variant-numeric: tabular-nums; }
+.wt button.sort { all: unset; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+.wt button.sort:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+.wt th[aria-sort] button.sort::after { content: "↕"; color: var(--ink2); font-size: 12px; opacity: .6; }
+.wt th[aria-sort="ascending"] button.sort::after { content: "▲"; opacity: 1; color: var(--accent); }
+.wt th[aria-sort="descending"] button.sort::after { content: "▼"; opacity: 1; color: var(--accent); }
+.wt tr[hidden] { display: none; }
+.filters { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 4px 0 8px; }
+.f-label { font-size: 14px; color: var(--ink2); margin-right: 4px; }
+.fbtn {
+  padding: 4px 12px; border: 2px solid var(--tile-line); border-radius: 999px; background: var(--tile);
+  color: var(--ink); font: 14px/1.4 var(--body); cursor: pointer;
+}
+.fbtn:hover { border-color: var(--accent); }
+.fbtn[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+
+/* ---------------------------------------------------------------- tabs */
+.tablist { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 12px; border-bottom: 2px solid var(--tile-line); padding-bottom: 8px; }
+.tablist [role="tab"] {
+  padding: 6px 14px; border: 2px solid var(--tile-line); border-radius: 6px; background: var(--tile);
+  color: var(--ink); font-size: 16px; cursor: pointer;
+}
+.tablist [role="tab"]:hover { border-color: var(--accent); }
+.tablist [role="tab"][aria-selected="true"] { background: var(--accent); border-color: var(--accent); color: var(--bg); }
+.js .tabpanel:not(.on) { display: none; }
+.tabpanel:focus-visible { outline: none; }
+
+/* ---------------------------------------------------------------- relations (sources / uses) */
+.rel { display: grid; gap: 4px 0; }
+.rel-g { display: grid; grid-template-columns: 160px minmax(0, 1fr); gap: 10px; align-items: start; padding: 6px 0; border-bottom: 1px dashed var(--tile-line); }
+.rel-g:last-child { border-bottom: 0; }
+.rel-h { margin: 6px 0 0; font-size: 16px; color: var(--ink2); }
+.rel-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 2px 10px; }
+.rel-list li { padding: 2px 0; }
+.rel-list li:has(.note) { flex-basis: 100%; }
+
+/* ---------------------------------------------------------------- drinks */
+ol.recipe { margin: 0 0 8px; padding-left: 26px; }
+ol.recipe li { padding: 3px 0; }
+ol.recipe li::marker { color: var(--ink2); }
+.infobox img.card { max-width: 100%; height: auto; }
+.so { display: flex; align-items: center; gap: 8px; }
+
+/* ---------------------------------------------------------------- crops */
+.stages { list-style: none; margin: 0 0 12px; padding: 0; display: flex; flex-wrap: wrap; gap: 10px; }
+.stages li { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 76px; padding: 8px 6px 6px; border: 2px solid var(--tile-line); border-radius: 6px; background: var(--tile); }
+.stages .frame {
+  display: block; width: calc(var(--fw) * var(--k) * 1px); height: calc(var(--fh) * var(--k) * 1px);
+  background-repeat: no-repeat; background-size: calc(var(--fw) * var(--n) * var(--k) * 1px) calc(var(--fh) * var(--k) * 1px);
+  background-position: calc(var(--i) * var(--fw) * var(--k) * -1px) 0; image-rendering: pixelated;
+}
+.stages .fl { font-size: 14px; color: var(--ink2); }
+.sub-h { font-size: 17px; }
+.sgrid { display: inline-grid; grid-template-columns: repeat(var(--n), 14px); gap: 2px; padding: 3px; background: var(--tile-line); border-radius: 3px; vertical-align: middle; }
+.sgrid > span, .sgrid-key { display: inline-block; width: 14px; height: 14px; }
+.g-n { background: var(--bg); }
+.g-w { background: var(--water); }
+.g-s { background: var(--accent); }
+.sgrid-key { margin: 0 6px 0 14px; vertical-align: -2px; border: 1px solid var(--tile-line); }
+.sgrid-key:first-child { margin-left: 0; }
+.legend { font-size: 14px; color: var(--ink2); }
+.season-sec h3 { margin-top: 16px; }
+
+/* ---------------------------------------------------------------- R&D processing */
+.zbar { display: inline-flex; width: 220px; max-width: 100%; height: 20px; margin-top: 4px; border: 2px solid var(--tile-line); border-radius: 4px; overflow: hidden; font-size: 11px; line-height: 16px; }
+.zb { text-align: center; color: var(--ink2); background: var(--tile); }
+.zb + .zb { border-left: 1px solid var(--tile-line); }
+.zb.on { background: var(--accent); color: var(--bg); font-weight: 700; }
+
+/* ---------------------------------------------------------------- history / navbox / spoiler */
+ul.history { list-style: none; margin: 0; padding: 0; }
+ul.history li { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 10px; padding: 6px 0; border-bottom: 1px dashed var(--tile-line); }
+ul.history .h-date { font-variant-numeric: tabular-nums; }
+.navbox { margin: 34px 0 10px; padding: 10px 14px 12px; border: 2px solid var(--tile-line); border-radius: 8px; background: var(--tile); }
+.navbox .nb-title { font-size: 19px; margin: 0 0 8px; border: 0; }
+.nb-h { font-size: 15px; margin: 8px 0 4px; color: var(--ink2); }
+.nb-list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 2px 0; }
+details.spoiler { margin: 8px 0; padding: 6px 12px; border: 2px dashed var(--tile-line); border-radius: 6px; }
+details.spoiler summary { cursor: pointer; color: var(--ink2); }
+
+/* ---------------------------------------------------------------- versions */
+.ver { padding: 4px 0 10px; border-bottom: 2px dashed var(--tile-line); }
+.ver h2 { font-size: 21px; margin: 18px 0 8px; }
+.ver h2 .anchor { text-decoration: none; color: var(--accent); }
+.ver p { max-width: 50em; }
+.cur { font-size: 17px; }
+
+/* ---------------------------------------------------------------- home */
+.home-top { display: grid; grid-template-columns: minmax(0, 300px) minmax(0, 1fr); gap: 20px; align-items: center; margin-bottom: 18px; }
+.verbox { padding: 6px 16px 4px; border: 12px solid transparent; border-image: url(ui_textbox.png) 12 fill / 12px / 0 stretch; background: var(--box) padding-box; image-rendering: pixelated; color: var(--card-ink); }
+.verbox h2 { font-size: 16px; margin: 0 0 4px; color: #e8d6bf; }
+.verbox strong { font-size: 22px; font-weight: normal; }
+.verbox a { color: #ffe1a6; }
+.verbox p { margin: 0 0 4px; }
+.navgroup h2 { font-size: 22px; margin: 24px 0 10px; }
+.tiles { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; }
+.tile {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 104px; padding: 12px 8px;
+  border: 2px solid var(--tile-line); border-radius: 8px; background: var(--tile); color: var(--ink); text-decoration: none; text-align: center;
+}
+.tile:hover { border-color: var(--accent); background: var(--tile-on); }
+.tile .tl { font-size: 18px; }
+.newbie { margin-top: 24px; }
+
+/* ---------------------------------------------------------------- footer */
+.foot { text-align: center; padding: 24px 20px 40px; font-size: 14px; color: var(--ink2); border-top: 2px solid var(--tile-line); max-width: 1160px; margin: 20px auto 0; }
+.foot p { margin: 4px 0; }
+
+/* ---------------------------------------------------------------- responsive */
+@media (max-width: 900px) {
+  .hud-logo .f-head { display: none; }
+  .home-top { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 719px) {
+  :root { --hud-h: 104px; }
+  .hud { flex-wrap: wrap; height: var(--hud-h); align-content: center; gap: 6px 10px; padding-top: 6px; padding-bottom: 6px; }
+  .hud .search { order: 5; flex: 1 1 100%; max-width: none; margin: 0; }
+  .hud-lang { margin-left: auto; }
+  main.wrap { padding: calc(var(--hud-h) + 10px) 14px 30px; }
+  h1 { font-size: 27px; }
+  h2 { font-size: 22px; }
+  .infobox { float: none; width: auto; margin: 0 0 14px; }
+  .rel-g { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  ul.history li { grid-template-columns: minmax(0, 1fr); gap: 0; }
+  .wt th[scope="row"], .wt thead th:first-child { position: sticky; left: 0; z-index: 1; background: var(--bg); }
+  .wt thead th:first-child { z-index: 2; background: var(--tile-on); }
+  .wt th[scope="row"] { box-shadow: 2px 0 0 var(--tile-line); min-width: 130px; }
+  .wt tbody tr:nth-child(even) > th[scope="row"] { background: var(--bg); }
+  .tiles { grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); }
+  .tile { min-height: 92px; }
+  .tile .tl { font-size: 16px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+
+/* ---------------------------------------------------------------- residents & calendar (res; pages/residents.py, pages/calendar.py) */
+.res-ov::after { content: ""; display: block; clear: both; }
+.res-ov .infobox .ib-art { min-height: 80px; }
+.pv { display: flex; flex-wrap: wrap; align-items: flex-end; gap: 6px; margin: 0 0 14px; }
+.pv-r { position: absolute; opacity: 0; width: 1px; height: 1px; margin: 0; pointer-events: none; }
+.pv-big { display: none; order: -1; flex: 0 0 100%; padding: 4px 0 6px; }
+.pv-big img { display: block; }
+.pv-r:checked + .pv-t + .pv-big { display: block; }
+.pv-t { display: inline-flex; padding: 2px; border: 2px solid var(--tile-line); border-radius: 6px; background: var(--tile); cursor: pointer; line-height: 0; }
+.pv-t img { width: 64px; height: 56px; object-fit: none; object-position: 50% 12%; }   /* 1:1 pixels, cropped to the face */
+.pv-t:hover { border-color: var(--accent); }
+.pv-r:checked + .pv-t { border-color: var(--accent); background: var(--tile-on); }
+.pv-r:focus-visible + .pv-t { outline: 3px solid var(--focus); outline-offset: 2px; }
+.bw { clear: none; margin-top: 18px; }
+.bw p { max-width: 44em; }
+.sch-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 540px)); gap: 0 28px; align-items: start; }
+.sch-w h3 { margin-top: 6px; }
+table.sch { width: 100%; margin: 0 0 14px; border: 2px solid var(--tile-line); border-radius: 6px; }
+table.sch caption { caption-side: top; text-align: left; font-weight: 600; padding: 2px 0 4px; color: var(--ink2); font-size: 14px; }
+table.sch td.tm { width: 1%; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.hearts { margin: 4px 0 6px; }
+.hearts .ic { margin-right: 4px; }
+ul.gift-rules { margin: 0 0 12px; padding-left: 22px; }
+.cal-wrap { border: 0; }
+table.cal { width: 100%; table-layout: fixed; border-collapse: separate; border-spacing: 4px; }
+table.cal th { font-weight: 600; font-size: 14px; color: var(--ink2); padding: 2px 0; text-align: center; }
+table.cal td { vertical-align: top; height: 86px; padding: 4px 6px; border: 2px solid var(--tile-line); border-radius: 6px; background: var(--tile); }
+table.cal td.has-b { background: var(--tile-on); border-color: var(--accent); }
+table.cal td:target { outline: 3px solid var(--focus); outline-offset: 1px; }
+.cal-d { display: block; font-size: 14px; color: var(--ink2); font-variant-numeric: tabular-nums; }
+.cal-b { display: flex; flex-direction: column; align-items: center; gap: 2px; margin-top: 2px; text-decoration: none; font-size: 14px; line-height: 1.2; text-align: center; }
+.cal-b .cn { overflow-wrap: anywhere; }
+@media (max-width: 719px) {
+  .sch-cols { grid-template-columns: minmax(0, 1fr); }
+  table.cal { border-spacing: 2px; }
+  table.cal td { height: 64px; padding: 2px 3px; }
+  .cal-b .cn { font-size: 11px; }
+}
+
+/* ---------------------------------------------------------------- dream (Dreamland section, pages/dream_*.py) */
+.danim { display: inline-block; flex: none; width: var(--w); height: var(--h); background-repeat: no-repeat; background-position: 0 0;
+  image-rendering: pixelated; animation: dream-steps var(--dur) steps(var(--n)) infinite; }
+@keyframes dream-steps { to { background-position: calc(var(--w) * var(--n) * -1) 0; } }
+.dfacts { margin: 0 0 12px; padding-left: 22px; }
+.dfacts li { padding: 2px 0; }
+.ddroplist { list-style: none; padding-left: 0; }
+.ddroplist li { display: flex; align-items: center; gap: 8px; }
+blockquote.gdesc .dq-src { margin-top: 6px; font-size: 13px; }
+.dtiles { margin: 12px 0 8px; }
+.darts { display: flex; align-items: flex-end; justify-content: center; gap: 18px; flex-wrap: wrap; }
+.dart { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.dart figcaption { font-size: 13px; color: #e3d2bd; }
+.dart img, .dart .danim { display: block; }
+table.dkv td { font-variant-numeric: tabular-nums; }
+.dswatch { display: inline-block; width: 18px; height: 18px; margin-right: 8px; vertical-align: -4px; border: 2px solid rgba(255, 255, 255, .6); border-radius: 3px; }
+ul.dlines { list-style: none; margin: 0; padding: 0; }
+ul.dlines li { padding: 1px 0; white-space: nowrap; }
+.wt.dlv th[scope="row"] { font-family: var(--head); white-space: nowrap; width: 1%; }
+.dgrid { list-style: none; margin: 0 0 12px; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; }
+.dcard { padding: 10px 12px 8px; border: 2px solid var(--tile-line); border-radius: 8px; background: var(--tile); }
+.dcard-art { display: flex; align-items: flex-end; justify-content: center; min-height: 104px; padding: 4px 0; }
+.dcard .dno { text-align: center; margin: 0 0 6px; }
+.sec .dcard table.kv, .sec .dboss table.kv { background: none; color: var(--ink); max-width: none; width: 100%; }
+.sec .dcard table.kv th, .sec .dboss table.kv th { color: var(--ink2); padding: 4px 10px 4px 0; }
+.sec .dcard table.kv td, .sec .dboss table.kv td { padding: 4px 0; }
+.sec .dcard table.kv tr + tr > *, .sec .dboss table.kv tr + tr > * { border-top: 1px dashed var(--tile-line); }
+.sec .dcard table.kv .note, .sec .dboss table.kv .note, .sec .dcard .note { color: var(--ink2); }
+.sec table.kv + .note { margin-top: 6px; }
+ul.dwhere { list-style: none; margin: 0; padding: 0; }
+ul.dwhere li { padding: 1px 0; }
+ul.dwhere a { margin-right: 6px; white-space: nowrap; display: inline-block; }
+.ddrops { display: flex; flex-wrap: wrap; gap: 2px 10px; }
+.dd { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+.dmini { display: inline-flex; flex-direction: column; align-items: center; gap: 2px; margin: 0 10px 4px 0; vertical-align: bottom; }
+.dboss { margin: 10px 0 22px; padding: 10px 14px; border: 2px solid var(--tile-line); border-radius: 8px; background: var(--tile); }
+.dboss h3 { margin: 4px 0 10px; font-size: 22px; }
+.dboss-in { display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap; }
+.dboss-art { flex: none; display: flex; justify-content: center; min-width: 120px; }
+.dboss-kv { flex: 1 1 300px; min-width: 0; }
+.dh4 { font-size: 16px; margin: 12px 0 4px; }
+.dfes { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 8px; }
+.dfe { display: inline-flex; align-items: center; gap: 2px; text-decoration: none; padding: 2px; border-radius: 4px; }
+.dfe:hover { background: var(--tile-on); }
+#t-dream-floors th[scope="row"] { white-space: nowrap; }
+@media (max-width: 719px) {
+  .dgrid { grid-template-columns: minmax(0, 1fr); }
+  ul.dlines li { white-space: normal; }
+}
+
+/* ---------------------------------------------------------------- shop / places / quests / arcade / start (tag: shop) */
+ul.hub-tiles > li { display: flex; flex-direction: column; }
+ul.hub-tiles > li > .tile { flex: 1 1 auto; }
+#nb-shop .nb-list li, #nb-start .nb-list li { margin-right: 20px; }
+.mlab { display: none; }
+a.pick { display: inline-flex; align-items: center; gap: 4px; }
+.tag-card { margin: 0 6px 0 2px; }
+#t-staff th[scope="row"] { white-space: nowrap; }
+.tile .tsub { font-size: 13px; color: var(--ink2); }
+.shop-tiles li { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.shop-tiles .tile { width: 100%; }
+.tkeep .chip { margin: 0; }
+.cell-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 2px 4px; }
+.cell-chips .chip { margin: 1px 0; }
+.tag-feat { color: var(--ink); border-color: var(--accent); background: var(--tile-on); }
+.lvn { font-family: var(--head); font-size: 20px; }
+.t-levels td, .t-levels th { vertical-align: top; }
+.t-levels .chip-sm { font-size: 13px; }
+.toc { display: flex; flex-wrap: wrap; gap: 4px; }
+.toc .tag { font-size: 14px; padding: 2px 10px; }
+/* talents */
+.tal-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.tal { display: flex; gap: 12px; align-items: flex-start; padding: 12px; border: 2px solid var(--tile-line); border-radius: 8px; background: var(--tile); }
+.tal:target { border-color: var(--accent); background: var(--tile-on); }
+.tal h3 { margin: 0 0 4px; font-size: 18px; }
+.tal p { margin: 0; font-size: 15px; }
+.tal-ic { flex: none; }
+/* staff */
+.staff-n { display: inline-flex; align-items: center; gap: 8px; }
+.staff-n .chip { margin: 0; }
+#t-staff p.ab { margin: 2px 0 0; font-size: 14px; }
+#t-staff td { vertical-align: top; }
+/* customers */
+.cust-grid { list-style: none; margin: 0 0 12px; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px; }
+.cust { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 4px; min-height: 96px; padding: 8px 4px 6px; border: 2px solid var(--tile-line); border-radius: 6px; background: var(--tile); }
+.cust .cl { font-size: 13px; color: var(--ink2); white-space: nowrap; }
+.stars { display: inline-flex; gap: 3px; }
+#t-special td { vertical-align: top; }
+#t-special .cell-chips { margin-top: 4px; }
+/* furniture */
+.furn-grid { list-style: none; margin: 0 0 16px; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 8px; }
+.furn { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 6px 8px; border: 2px solid var(--tile-line); border-radius: 6px; background: var(--tile); }
+.furn:target { border-color: var(--accent); background: var(--tile-on); }
+.furn .fi { display: flex; align-items: flex-end; justify-content: center; min-height: 90px; }
+.furn .fm { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px 8px; font-size: 14px; }
+.furn .fc, .furn .fl { font-size: 13px; color: var(--ink2); }
+.furn-lv { list-style: none; margin: 0; padding: 0; }
+.furn-lv li { display: grid; grid-template-columns: 70px minmax(0, 1fr); gap: 8px; align-items: center; padding: 4px 0; border-bottom: 1px dashed var(--tile-line); }
+.furn-lv li:target { background: var(--tile-on); }
+.furn-lv .fxl { color: var(--ink2); font-size: 14px; }
+.furn-lv .fxs { display: flex; flex-wrap: wrap; gap: 6px; align-items: flex-end; }
+/* places */
+.area h3 { margin: 14px 0 6px; }
+.area:target h3 { color: var(--accent); }
+#t-buildings tr:target > * { background: var(--tile-on); }
+#t-buildings .ic { margin-right: 6px; }
+/* quests */
+.quest { margin: 0 0 14px; padding: 10px 14px 12px; border: 2px solid var(--tile-line); border-radius: 8px; background: var(--tile); }
+.quest:target { border-color: var(--accent); }
+.quest h3 { display: flex; align-items: center; gap: 8px; margin: 0 0 8px; }
+.quest blockquote.gdesc { background: transparent; }
+.q-lab { font-size: 15px; color: var(--ink2); margin: 10px 0 4px; font-family: var(--body); }
+.q-steps { margin: 0 0 6px; padding-left: 24px; }
+.q-steps li { padding: 2px 0; }
+.q-rew { margin-top: 6px; }
+/* arcade */
+.game { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 18px; align-items: start; margin: 0 0 16px; padding: 12px 16px; border: 2px solid var(--tile-line); border-radius: 8px; background: var(--tile); }
+.game-art { display: flex; justify-content: center; padding-top: 6px; }
+.game-tx .q-lab:first-child { margin-top: 0; }
+.game-l { margin: 0 0 6px; padding-left: 20px; }
+.game-l li { padding: 2px 0; }
+ol.melon { list-style: none; margin: 8px 0 4px; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+ol.melon li { display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 2px; min-width: 64px; padding: 6px 4px 4px; border: 1px solid var(--tile-line); border-radius: 6px; background: var(--bg); }
+ol.melon .ml { font-size: 12px; color: var(--ink2); }
+ol.melon .mp { font-variant-numeric: tabular-nums; font-weight: 600; }
+/* tutorials */
+.tut-page { display: grid; grid-template-columns: repeat(2, minmax(0, 480px)); gap: 16px 24px; margin: 0 0 18px; }
+.tut-col { margin: 0; }
+img.shot { display: block; width: 100%; max-width: 480px; height: auto; border: 2px solid var(--tile-line); border-radius: 4px; }
+.tut-tx { padding: 8px 2px 0; font-size: 15px; }
+.tut-tx p { margin: 0 0 6px; }
+/* controls / time */
+.key { display: inline-flex; align-items: center; margin: 2px 8px 2px 0; vertical-align: middle; }
+.key-t { padding: 0 6px; border: 1px solid var(--tile-line); border-radius: 4px; font-size: 13px; }
+.t-keys td { white-space: nowrap; }
+table.kv.wt { width: auto; min-width: 320px; }
+.hud-icons { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 8px; }
+.hud-icons li { display: flex; align-items: center; gap: 12px; padding: 8px 10px; border: 2px solid var(--tile-line); border-radius: 6px; background: var(--tile); }
+ul.facts { margin: 0 0 10px; padding-left: 20px; }
+ul.facts li { padding: 2px 0; }
+@media (max-width: 900px) {
+  .tal-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 719px) {
+  .t-levels thead { display: none; }
+  .t-levels, .t-levels tbody { display: block; }
+  .t-levels tr { display: grid; grid-template-columns: 40px minmax(0, 1fr) auto; gap: 4px 8px; padding: 8px 10px; border-bottom: 1px solid var(--tile-line); }
+  .t-levels tbody tr:nth-child(even) { background: var(--row); }
+  .t-levels tbody tr > * { background: none !important; }
+  .t-levels th[scope="row"] { position: static; min-width: 0; box-shadow: none; grid-row: span 3; padding: 0; border: 0; }
+  .t-levels td { display: block; padding: 0; border: 0; }
+  .t-levels td:nth-child(4), .t-levels td:nth-child(5) { grid-column: 2 / -1; }
+  .t-levels .mlab { display: block; font-size: 12px; color: var(--ink2); }
+  .tut-page { grid-template-columns: minmax(0, 1fr); }
+  .game { grid-template-columns: minmax(0, 1fr); }
+  .furn-grid { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); }
+  .t-keys td { white-space: normal; }
+  table.kv.wt { min-width: 0; width: 100%; }
+}
+
+/* ---- icons (generated by lib/icons.py) ---- */
+.iad62d3,.i0b58ce,.idfb948,.i369871,.ifd8ca1,.i118f28,.i7bf9ba,.if454bb,.ifb9c71,.i00fa7f,.ifc3400,.i7a76f2,.ibd377c,.i27de4c,.ia2c514,.icc2ba8,.id3b843,.i2ba096,.i27812c,.i5f3c9a,.ib50e9e,.ibd4815,.ic0435e,.i1d311f,.i1e5921,.i5f4a5c,.i7a928e,.i2e1697,.i9846c5,.ia13b38,.icf5fac,.i6865e0,.ia8669c,.ic8e886,.i0c2b27,.i1007ac,.i7597b4,.i71bc44,.i0a2329,.i4770cc,.if0356c,.if67603,.ibcc923,.id2017d,.i28a90a,.i8494ef,.i184b7a,.i54b61d,.i8050bc,.ia14de6,.ia62571,.iadbbda,.ib89f9c,.ic7d876,.ife9dfd,.i5660de,.ibebf4e,.i9656a7,.ida990d,.id7697d,.i00fb45,.i15850e,.i163ed0,.i2266d9,.i33dc2d,.i344a13,.i3564f6,.i36af7c,.i3fe1ed,.i57ec15,.i60b7ea,.i664df4,.i6933c0,.i6b6f07,.i72e220,.i795131,.ia214e0,.ia2de36,.iba0573,.iba8804,.ibb2477,.ic71eef,.ica57b8,.icca773,.id3aa07,.id44c9d,.id6d2fe,.ide3f41,.iec6060,.ifad648,.ifbcbcd,.ifc7bbf,.ifea8fa,.i0cd6a2,.i01b90d,.i0c4a3d,.i005581,.i0475da,.ia1ad0d,.idb0dd0,.ie3e3db,.i524063,.i66b83e,.i58ed14,.i6e362f,.i6e80e6,.if296dd,.i195cdd,.i662362,.i5fe36c,.i36a0d7,.ifb5647,.i490824,.i7b3dbf,.i679ccf,.i827214,.ic3b5dc,.i63af8d,.i346b84,.i8e1f0f,.id62434,.i1d78a0,.i247159,.i3d1b29,.ie71313,.i12d33b,.i270c99,.ia32943,.icec460,.i2f1c99,.i506e62,.i6ffb21,.i9e7b58,.ic952b9,.i0a2c8d,.i3d1934,.i6fd3ba,.i0f8729,.i08f9c5,.i3b4084,.i3d387d,.ia3e280,.ib27d6c,.if56754,.i196200,.i2e082b,.i754271,.id18559,.id3aac6,.i3e7a34,.i5fc3d3,.iee6e76,.i2fce8d,.i328e75,.i76874a,.idb7340,.i7ab7b0,.i722e94,.i7dab1c,.i895f0a,.ibbf52b,.i9b1ac6,.i5ea309,.i995469,.i7c12cf,.i89b20a,.ibb9535,.id4ff17,.id52f37,.id915b4,.idc6d2f,.if0213c,.if6e03b,.icf05a0,.i51fdfe,.ifb368f,.i176c56,.ib3193b,.id52180,.if13d8b,.i2a73b0,.i6441a7,.i58f14a,.i6d424b,.i758aa4,.i548684,.i6774ec,.if884c1,.i630b0d,.i1f68d5,.i3ecf6a,.i4cc9cd,.i52e179,.i5cf4bd,.i69c662,.i82a1c7,.ie11e7f,.i869bda,.i818592,.i4602ea,.i5f3750,.i9a8c80,.i8c1e41,.i521321,.i151c15,.i343835,.i55f5aa,.i7c7dd4,.i8e5e34,.iba074b,.ic48468,.ic75030,.i1b0c24,.id1c13a,.i2ebafb,.i5d32ff,.ibbfbac,.i068b22,.if90ac6,.i2380cf,.i590969,.i60773f,.i6bec59,.ibb9d9c,.ib54cce,.i0434c0,.i04e159,.i07be7f,.i07d9a2,.i08c0da,.i10c5d6,.i1913d0,.i2956e4,.i29d173,.i3392d8{background-image:url(atlas-0.png);--aw:512;--ah:489}
+.iad62d3{--x:0;--y:0;--w:64;--h:64;--k1:1;--k2:1;--k3:1}
+.i0b58ce{--x:65;--y:0;--w:52;--h:52;--k1:1;--k2:2;--k3:2}
+.idfb948{--x:118;--y:0;--w:37;--h:52;--k1:1;--k2:2;--k3:3}
+.i369871{--x:156;--y:0;--w:32;--h:51;--k1:1;--k2:1;--k3:1}
+.ifd8ca1{--x:189;--y:0;--w:31;--h:48;--k1:1;--k2:2;--k3:3}
+.i118f28{--x:221;--y:0;--w:25;--h:48;--k1:1;--k2:1;--k3:1}
+.i7bf9ba{--x:247;--y:0;--w:25;--h:48;--k1:1;--k2:1;--k3:1}
+.if454bb{--x:273;--y:0;--w:25;--h:48;--k1:1;--k2:1;--k3:1}
+.ifb9c71{--x:299;--y:0;--w:23;--h:48;--k1:1;--k2:1;--k3:1}
+.i00fa7f{--x:323;--y:0;--w:28;--h:47;--k1:1;--k2:2;--k3:3}
+.ifc3400{--x:352;--y:0;--w:28;--h:47;--k1:1;--k2:1;--k3:1}
+.i7a76f2{--x:381;--y:0;--w:42;--h:45;--k1:1;--k2:1;--k3:1}
+.ibd377c{--x:424;--y:0;--w:44;--h:44;--k1:1;--k2:2;--k3:2}
+.i27de4c{--x:0;--y:65;--w:48;--h:43;--k1:1;--k2:2;--k3:3}
+.ia2c514{--x:49;--y:65;--w:48;--h:43;--k1:1;--k2:2;--k3:3}
+.icc2ba8{--x:98;--y:65;--w:48;--h:43;--k1:1;--k2:2;--k3:3}
+.id3b843{--x:147;--y:65;--w:48;--h:43;--k1:1;--k2:2;--k3:3}
+.i2ba096{--x:196;--y:65;--w:43;--h:43;--k1:1;--k2:1;--k3:1}
+.i27812c{--x:240;--y:65;--w:32;--h:43;--k1:1;--k2:2;--k3:3}
+.i5f3c9a{--x:273;--y:65;--w:32;--h:43;--k1:1;--k2:2;--k3:3}
+.ib50e9e{--x:306;--y:65;--w:32;--h:43;--k1:1;--k2:2;--k3:3}
+.ibd4815{--x:339;--y:65;--w:32;--h:43;--k1:1;--k2:2;--k3:3}
+.ic0435e{--x:372;--y:65;--w:32;--h:43;--k1:1;--k2:1;--k3:1}
+.i1d311f{--x:405;--y:65;--w:48;--h:42;--k1:1;--k2:2;--k3:3}
+.i1e5921{--x:454;--y:65;--w:48;--h:42;--k1:1;--k2:2;--k3:3}
+.i5f4a5c{--x:0;--y:109;--w:48;--h:42;--k1:1;--k2:2;--k3:3}
+.i7a928e{--x:49;--y:109;--w:48;--h:42;--k1:1;--k2:2;--k3:3}
+.i2e1697{--x:98;--y:109;--w:32;--h:42;--k1:1;--k2:2;--k3:3}
+.i9846c5{--x:131;--y:109;--w:32;--h:42;--k1:1;--k2:2;--k3:3}
+.ia13b38{--x:164;--y:109;--w:32;--h:42;--k1:1;--k2:2;--k3:3}
+.icf5fac{--x:197;--y:109;--w:32;--h:42;--k1:1;--k2:2;--k3:3}
+.i6865e0{--x:230;--y:109;--w:48;--h:41;--k1:1;--k2:2;--k3:3}
+.ia8669c{--x:279;--y:109;--w:48;--h:41;--k1:1;--k2:2;--k3:3}
+.ic8e886{--x:328;--y:109;--w:48;--h:41;--k1:1;--k2:2;--k3:3}
+.i0c2b27{--x:377;--y:109;--w:32;--h:41;--k1:1;--k2:2;--k3:3}
+.i1007ac{--x:410;--y:109;--w:32;--h:41;--k1:1;--k2:2;--k3:3}
+.i7597b4{--x:443;--y:109;--w:32;--h:41;--k1:1;--k2:2;--k3:3}
+.i71bc44{--x:0;--y:152;--w:42;--h:39;--k1:1;--k2:1;--k3:2}
+.i0a2329{--x:43;--y:152;--w:40;--h:39;--k1:1;--k2:1;--k3:2}
+.i4770cc{--x:84;--y:152;--w:31;--h:39;--k1:1;--k2:1;--k3:2}
+.if0356c{--x:116;--y:152;--w:42;--h:38;--k1:1;--k2:1;--k3:2}
+.if67603{--x:159;--y:152;--w:38;--h:38;--k1:1;--k2:2;--k3:2}
+.ibcc923{--x:198;--y:152;--w:34;--h:38;--k1:1;--k2:1;--k3:2}
+.id2017d{--x:233;--y:152;--w:31;--h:38;--k1:1;--k2:1;--k3:2}
+.i28a90a{--x:265;--y:152;--w:29;--h:38;--k1:1;--k2:1;--k3:2}
+.i8494ef{--x:295;--y:152;--w:29;--h:38;--k1:1;--k2:1;--k3:2}
+.i184b7a{--x:325;--y:152;--w:32;--h:37;--k1:1;--k2:1;--k3:2}
+.i54b61d{--x:358;--y:152;--w:32;--h:37;--k1:1;--k2:1;--k3:2}
+.i8050bc{--x:391;--y:152;--w:32;--h:37;--k1:1;--k2:1;--k3:2}
+.ia14de6{--x:424;--y:152;--w:32;--h:37;--k1:1;--k2:1;--k3:2}
+.ia62571{--x:457;--y:152;--w:32;--h:37;--k1:1;--k2:1;--k3:2}
+.iadbbda{--x:0;--y:192;--w:32;--h:37;--k1:1;--k2:1;--k3:2}
+.ib89f9c{--x:33;--y:192;--w:32;--h:37;--k1:1;--k2:1;--k3:2}
+.ic7d876{--x:66;--y:192;--w:32;--h:37;--k1:1;--k2:1;--k3:2}
+.ife9dfd{--x:99;--y:192;--w:32;--h:37;--k1:1;--k2:1;--k3:2}
+.i5660de{--x:132;--y:192;--w:39;--h:36;--k1:1;--k2:1;--k3:2}
+.ibebf4e{--x:172;--y:192;--w:39;--h:36;--k1:1;--k2:2;--k3:3}
+.i9656a7{--x:212;--y:192;--w:19;--h:34;--k1:1;--k2:1;--k3:2}
+.ida990d{--x:232;--y:192;--w:36;--h:33;--k1:1;--k2:2;--k3:3}
+.id7697d{--x:269;--y:192;--w:33;--h:32;--k1:1;--k2:1;--k3:2}
+.i00fb45{--x:303;--y:192;--w:32;--h:32;--k1:1;--k2:1;--k3:2}
+.i15850e{--x:336;--y:192;--w:32;--h:32;--k1:1;--k2:1;--k3:2}
+.i163ed0{--x:369;--y:192;--w:32;--h:32;--k1:1;--k2:2;--k3:2}
+.i2266d9{--x:402;--y:192;--w:32;--h:32;--k1:1;--k2:1;--k3:2}
+.i33dc2d{--x:435;--y:192;--w:32;--h:32;--k1:1;--k2:1;--k3:2}
+.i344a13{--x:468;--y:192;--w:32;--h:32;--k1:1;--k2:1;--k3:2}
+.i3564f6{--x:0;--y:230;--w:32;--h:32;--k1:1;--k2:1;--k3:2}
+.i36af7c{--x:33;--y:230;--w:32;--h:32;--k1:1;--k2:1;--k3:2}
+.i3fe1ed{--x:66;--y:230;--w:32;--h:32;--k1:1;--k2:1;--k3:2}
+.i57ec15{--x:99;--y:230;--w:32;--h:32;--k1:1;--k2:1;--k3:2}
+.i60b7ea{--x:132;--y:230;--w:32;--h:32;--k1:1;--k2:1;--k3:2}
+.i664df4{--x:165;--y:230;--w:32;--h:32;--k1:1;--k2:1;--k3:2}
+.i6933c0{--x:198;--y:230;--w:32;--h:32;--k1:1;--k2:1;--k3:2}
+.i6b6f07{--x:231;--y:230;--w:32;--h:32;--k1:1;--k2:1;--k3:2}
+.i72e220{--x:264;--y:230;--w:32;--h:32;--k1:1;--k2:1;--k3:2}
+.i795131{--x:297;--y:230;--w:32;--h:32;--k1:1;--k2:1;--k3:2}
+.ia214e0{--x:330;--y:230;--w:32;--h:32;--k1:1;--k2:1;--k3:2}
+.ia2de36{--x:363;--y:230;--w:32;--h:32;--k1:1;--k2:1;--k3:2}
+.iba0573{--x:396;--y:230;--w:32;--h:32;--k1:1;--k2:1;--k3:2}
+.iba8804{--x:429;--y:230;--w:32;--h:32;--k1:1;--k2:1;--k3:2}
+.ibb2477{--x:462;--y:230;--w:32;--h:32;--k1:1;--k2:1;--k3:2}
+.ic71eef{--x:0;--y:263;--w:32;--h:32;--k1:1;--k2:1;--k3:2}
+.ica57b8{--x:33;--y:263;--w:32;--h:32;--k1:1;--k2:1;--k3:2}
+.icca773{--x:66;--y:263;--w:32;--h:32;--k1:1;--k2:1;--k3:2}
+.id3aa07{--x:99;--y:263;--w:32;--h:32;--k1:1;--k2:1;--k3:2}
+.id44c9d{--x:132;--y:263;--w:32;--h:32;--k1:1;--k2:1;--k3:2}
+.id6d2fe{--x:165;--y:263;--w:32;--h:32;--k1:1;--k2:1;--k3:2}
+.ide3f41{--x:198;--y:263;--w:32;--h:32;--k1:1;--k2:1;--k3:2}
+.iec6060{--x:231;--y:263;--w:32;--h:32;--k1:1;--k2:1;--k3:2}
+.ifad648{--x:264;--y:263;--w:32;--h:32;--k1:1;--k2:1;--k3:2}
+.ifbcbcd{--x:297;--y:263;--w:32;--h:32;--k1:1;--k2:1;--k3:2}
+.ifc7bbf{--x:330;--y:263;--w:32;--h:32;--k1:1;--k2:1;--k3:2}
+.ifea8fa{--x:363;--y:263;--w:28;--h:32;--k1:1;--k2:1;--k3:2}
+.i0cd6a2{--x:392;--y:263;--w:27;--h:32;--k1:1;--k2:1;--k3:2}
+.i01b90d{--x:420;--y:263;--w:25;--h:32;--k1:1;--k2:1;--k3:2}
+.i0c4a3d{--x:446;--y:263;--w:22;--h:32;--k1:1;--k2:2;--k3:2}
+.i005581{--x:469;--y:263;--w:31;--h:31;--k1:1;--k2:2;--k3:3}
+.i0475da{--x:0;--y:296;--w:28;--h:31;--k1:1;--k2:1;--k3:2}
+.ia1ad0d{--x:29;--y:296;--w:28;--h:31;--k1:1;--k2:1;--k3:2}
+.idb0dd0{--x:58;--y:296;--w:28;--h:31;--k1:1;--k2:1;--k3:2}
+.ie3e3db{--x:87;--y:296;--w:27;--h:31;--k1:1;--k2:1;--k3:2}
+.i524063{--x:115;--y:296;--w:14;--h:31;--k1:1;--k2:2;--k3:3}
+.i66b83e{--x:130;--y:296;--w:34;--h:30;--k1:1;--k2:1;--k3:2}
+.i58ed14{--x:165;--y:296;--w:30;--h:30;--k1:1;--k2:1;--k3:2}
+.i6e362f{--x:196;--y:296;--w:30;--h:30;--k1:1;--k2:1;--k3:2}
+.i6e80e6{--x:227;--y:296;--w:30;--h:30;--k1:1;--k2:1;--k3:2}
+.if296dd{--x:258;--y:296;--w:30;--h:30;--k1:1;--k2:1;--k3:2}
+.i195cdd{--x:289;--y:296;--w:22;--h:30;--k1:1;--k2:1;--k3:2}
+.i662362{--x:312;--y:296;--w:22;--h:30;--k1:1;--k2:1;--k3:2}
+.i5fe36c{--x:335;--y:296;--w:20;--h:30;--k1:1;--k2:1;--k3:2}
+.i36a0d7{--x:356;--y:296;--w:17;--h:30;--k1:1;--k2:1;--k3:2}
+.ifb5647{--x:374;--y:296;--w:21;--h:29;--k1:1;--k2:1;--k3:2}
+.i490824{--x:396;--y:296;--w:20;--h:29;--k1:1;--k2:1;--k3:2}
+.i7b3dbf{--x:417;--y:296;--w:32;--h:28;--k1:1;--k2:1;--k3:2}
+.i679ccf{--x:450;--y:296;--w:28;--h:28;--k1:1;--k2:1;--k3:2}
+.i827214{--x:479;--y:296;--w:28;--h:28;--k1:1;--k2:1;--k3:2}
+.ic3b5dc{--x:0;--y:328;--w:26;--h:28;--k1:1;--k2:1;--k3:2}
+.i63af8d{--x:27;--y:328;--w:24;--h:28;--k1:1;--k2:1;--k3:2}
+.i346b84{--x:52;--y:328;--w:21;--h:28;--k1:1;--k2:2;--k3:3}
+.i8e1f0f{--x:74;--y:328;--w:20;--h:28;--k1:1;--k2:2;--k3:3}
+.id62434{--x:95;--y:328;--w:18;--h:28;--k1:1;--k2:2;--k3:3}
+.i1d78a0{--x:114;--y:328;--w:17;--h:28;--k1:1;--k2:1;--k3:2}
+.i247159{--x:132;--y:328;--w:16;--h:28;--k1:1;--k2:2;--k3:3}
+.i3d1b29{--x:149;--y:328;--w:14;--h:28;--k1:1;--k2:2;--k3:3}
+.ie71313{--x:164;--y:328;--w:14;--h:28;--k1:1;--k2:2;--k3:3}
+.i12d33b{--x:179;--y:328;--w:48;--h:27;--k1:1;--k2:2;--k3:3}
+.i270c99{--x:228;--y:328;--w:48;--h:27;--k1:1;--k2:2;--k3:3}
+.ia32943{--x:277;--y:328;--w:48;--h:27;--k1:1;--k2:2;--k3:3}
+.icec460{--x:326;--y:328;--w:48;--h:27;--k1:1;--k2:2;--k3:3}
+.i2f1c99{--x:375;--y:328;--w:32;--h:27;--k1:1;--k2:2;--k3:3}
+.i506e62{--x:408;--y:328;--w:32;--h:27;--k1:1;--k2:2;--k3:3}
+.i6ffb21{--x:441;--y:328;--w:32;--h:27;--k1:1;--k2:1;--k3:2}
+.i9e7b58{--x:474;--y:328;--w:32;--h:27;--k1:1;--k2:2;--k3:3}
+.ic952b9{--x:0;--y:357;--w:32;--h:27;--k1:1;--k2:2;--k3:3}
+.i0a2c8d{--x:33;--y:357;--w:30;--h:27;--k1:1;--k2:1;--k3:2}
+.i3d1934{--x:64;--y:357;--w:28;--h:27;--k1:1;--k2:2;--k3:3}
+.i6fd3ba{--x:93;--y:357;--w:28;--h:27;--k1:1;--k2:1;--k3:2}
+.i0f8729{--x:122;--y:357;--w:27;--h:27;--k1:1;--k2:1;--k3:2}
+.i08f9c5{--x:150;--y:357;--w:24;--h:27;--k1:1;--k2:1;--k3:2}
+.i3b4084{--x:175;--y:357;--w:24;--h:27;--k1:1;--k2:1;--k3:2}
+.i3d387d{--x:200;--y:357;--w:24;--h:27;--k1:1;--k2:1;--k3:2}
+.ia3e280{--x:225;--y:357;--w:24;--h:27;--k1:1;--k2:1;--k3:2}
+.ib27d6c{--x:250;--y:357;--w:24;--h:27;--k1:1;--k2:1;--k3:2}
+.if56754{--x:275;--y:357;--w:24;--h:27;--k1:1;--k2:1;--k3:2}
+.i196200{--x:300;--y:357;--w:20;--h:27;--k1:1;--k2:1;--k3:2}
+.i2e082b{--x:321;--y:357;--w:16;--h:27;--k1:1;--k2:2;--k3:3}
+.i754271{--x:338;--y:357;--w:16;--h:27;--k1:1;--k2:2;--k3:3}
+.id18559{--x:355;--y:357;--w:16;--h:27;--k1:1;--k2:2;--k3:3}
+.id3aac6{--x:372;--y:357;--w:16;--h:27;--k1:1;--k2:2;--k3:3}
+.i3e7a34{--x:389;--y:357;--w:48;--h:26;--k1:1;--k2:2;--k3:3}
+.i5fc3d3{--x:438;--y:357;--w:48;--h:26;--k1:1;--k2:2;--k3:3}
+.iee6e76{--x:0;--y:385;--w:48;--h:26;--k1:1;--k2:2;--k3:3}
+.i2fce8d{--x:49;--y:385;--w:32;--h:26;--k1:1;--k2:2;--k3:3}
+.i328e75{--x:82;--y:385;--w:32;--h:26;--k1:1;--k2:2;--k3:3}
+.i76874a{--x:115;--y:385;--w:32;--h:26;--k1:1;--k2:2;--k3:3}
+.idb7340{--x:148;--y:385;--w:32;--h:26;--k1:1;--k2:2;--k3:3}
+.i7ab7b0{--x:181;--y:385;--w:31;--h:26;--k1:1;--k2:1;--k3:2}
+.i722e94{--x:213;--y:385;--w:30;--h:26;--k1:1;--k2:1;--k3:2}
+.i7dab1c{--x:244;--y:385;--w:30;--h:26;--k1:1;--k2:2;--k3:3}
+.i895f0a{--x:275;--y:385;--w:30;--h:26;--k1:1;--k2:2;--k3:3}
+.ibbf52b{--x:306;--y:385;--w:30;--h:26;--k1:1;--k2:1;--k3:2}
+.i9b1ac6{--x:337;--y:385;--w:28;--h:26;--k1:1;--k2:1;--k3:2}
+.i5ea309{--x:366;--y:385;--w:22;--h:26;--k1:1;--k2:2;--k3:3}
+.i995469{--x:389;--y:385;--w:19;--h:26;--k1:1;--k2:1;--k3:2}
+.i7c12cf{--x:409;--y:385;--w:18;--h:26;--k1:1;--k2:2;--k3:3}
+.i89b20a{--x:428;--y:385;--w:16;--h:26;--k1:1;--k2:2;--k3:3}
+.ibb9535{--x:445;--y:385;--w:16;--h:26;--k1:1;--k2:2;--k3:3}
+.id4ff17{--x:462;--y:385;--w:16;--h:26;--k1:1;--k2:2;--k3:3}
+.id52f37{--x:479;--y:385;--w:16;--h:26;--k1:1;--k2:2;--k3:3}
+.id915b4{--x:496;--y:385;--w:16;--h:26;--k1:1;--k2:2;--k3:3}
+.idc6d2f{--x:0;--y:412;--w:16;--h:26;--k1:1;--k2:2;--k3:3}
+.if0213c{--x:17;--y:412;--w:16;--h:26;--k1:1;--k2:2;--k3:3}
+.if6e03b{--x:34;--y:412;--w:16;--h:26;--k1:1;--k2:2;--k3:3}
+.icf05a0{--x:51;--y:412;--w:15;--h:26;--k1:1;--k2:2;--k3:4}
+.i51fdfe{--x:67;--y:412;--w:14;--h:26;--k1:1;--k2:2;--k3:3}
+.ifb368f{--x:82;--y:412;--w:14;--h:26;--k1:1;--k2:2;--k3:3}
+.i176c56{--x:97;--y:412;--w:48;--h:25;--k1:1;--k2:2;--k3:3}
+.ib3193b{--x:146;--y:412;--w:48;--h:25;--k1:1;--k2:2;--k3:3}
+.id52180{--x:195;--y:412;--w:48;--h:25;--k1:1;--k2:2;--k3:3}
+.if13d8b{--x:244;--y:412;--w:48;--h:25;--k1:1;--k2:2;--k3:3}
+.i2a73b0{--x:293;--y:412;--w:36;--h:25;--k1:1;--k2:2;--k3:3}
+.i6441a7{--x:330;--y:412;--w:36;--h:25;--k1:1;--k2:1;--k3:2}
+.i58f14a{--x:367;--y:412;--w:32;--h:25;--k1:1;--k2:2;--k3:3}
+.i6d424b{--x:400;--y:412;--w:32;--h:25;--k1:1;--k2:2;--k3:3}
+.i758aa4{--x:433;--y:412;--w:32;--h:25;--k1:1;--k2:2;--k3:3}
+.i548684{--x:466;--y:412;--w:27;--h:25;--k1:1;--k2:2;--k3:4}
+.i6774ec{--x:0;--y:439;--w:23;--h:25;--k1:1;--k2:1;--k3:3}
+.if884c1{--x:24;--y:439;--w:23;--h:25;--k1:1;--k2:1;--k3:3}
+.i630b0d{--x:48;--y:439;--w:20;--h:25;--k1:1;--k2:1;--k3:3}
+.i1f68d5{--x:69;--y:439;--w:17;--h:25;--k1:1;--k2:2;--k3:3}
+.i3ecf6a{--x:87;--y:439;--w:16;--h:25;--k1:1;--k2:2;--k3:3}
+.i4cc9cd{--x:104;--y:439;--w:16;--h:25;--k1:1;--k2:2;--k3:3}
+.i52e179{--x:121;--y:439;--w:16;--h:25;--k1:1;--k2:2;--k3:3}
+.i5cf4bd{--x:138;--y:439;--w:16;--h:25;--k1:1;--k2:2;--k3:3}
+.i69c662{--x:155;--y:439;--w:16;--h:25;--k1:1;--k2:2;--k3:3}
+.i82a1c7{--x:172;--y:439;--w:15;--h:25;--k1:1;--k2:1;--k3:3}
+.ie11e7f{--x:188;--y:439;--w:15;--h:25;--k1:1;--k2:2;--k3:3}
+.i869bda{--x:204;--y:439;--w:13;--h:25;--k1:1;--k2:2;--k3:3}
+.i818592{--x:218;--y:439;--w:35;--h:24;--k1:1;--k2:1;--k3:2}
+.i4602ea{--x:254;--y:439;--w:29;--h:24;--k1:1;--k2:2;--k3:3}
+.i5f3750{--x:284;--y:439;--w:29;--h:24;--k1:1;--k2:1;--k3:2}
+.i9a8c80{--x:314;--y:439;--w:26;--h:24;--k1:1;--k2:1;--k3:2}
+.i8c1e41{--x:341;--y:439;--w:24;--h:24;--k1:1;--k2:1;--k3:3}
+.i521321{--x:366;--y:439;--w:19;--h:24;--k1:1;--k2:2;--k3:3}
+.i151c15{--x:386;--y:439;--w:18;--h:24;--k1:1;--k2:1;--k3:3}
+.i343835{--x:405;--y:439;--w:18;--h:24;--k1:1;--k2:2;--k3:3}
+.i55f5aa{--x:424;--y:439;--w:18;--h:24;--k1:1;--k2:1;--k3:3}
+.i7c7dd4{--x:443;--y:439;--w:18;--h:24;--k1:1;--k2:2;--k3:3}
+.i8e5e34{--x:462;--y:439;--w:18;--h:24;--k1:1;--k2:1;--k3:3}
+.iba074b{--x:481;--y:439;--w:18;--h:24;--k1:1;--k2:1;--k3:3}
+.ic48468{--x:0;--y:465;--w:18;--h:24;--k1:1;--k2:2;--k3:3}
+.ic75030{--x:19;--y:465;--w:18;--h:24;--k1:1;--k2:2;--k3:3}
+.i1b0c24{--x:38;--y:465;--w:17;--h:24;--k1:1;--k2:1;--k3:3}
+.id1c13a{--x:56;--y:465;--w:17;--h:24;--k1:1;--k2:2;--k3:3}
+.i2ebafb{--x:74;--y:465;--w:16;--h:24;--k1:1;--k2:1;--k3:3}
+.i5d32ff{--x:91;--y:465;--w:16;--h:24;--k1:1;--k2:2;--k3:3}
+.ibbfbac{--x:108;--y:465;--w:16;--h:24;--k1:1;--k2:2;--k3:3}
+.i068b22{--x:125;--y:465;--w:14;--h:24;--k1:1;--k2:2;--k3:3}
+.if90ac6{--x:140;--y:465;--w:14;--h:24;--k1:1;--k2:2;--k3:3}
+.i2380cf{--x:155;--y:465;--w:23;--h:23;--k1:1;--k2:1;--k3:3}
+.i590969{--x:179;--y:465;--w:23;--h:23;--k1:1;--k2:2;--k3:4}
+.i60773f{--x:203;--y:465;--w:23;--h:23;--k1:1;--k2:1;--k3:3}
+.i6bec59{--x:227;--y:465;--w:23;--h:23;--k1:1;--k2:2;--k3:4}
+.ibb9d9c{--x:251;--y:465;--w:23;--h:23;--k1:1;--k2:2;--k3:2}
+.ib54cce{--x:275;--y:465;--w:21;--h:23;--k1:1;--k2:1;--k3:3}
+.i0434c0{--x:297;--y:465;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.i04e159{--x:317;--y:465;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.i07be7f{--x:337;--y:465;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.i07d9a2{--x:357;--y:465;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.i08c0da{--x:377;--y:465;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.i10c5d6{--x:397;--y:465;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.i1913d0{--x:417;--y:465;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.i2956e4{--x:437;--y:465;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.i29d173{--x:457;--y:465;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.i3392d8{--x:477;--y:465;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.i365d74,.i3729f3,.i3785ed,.i379ea4,.i4581f3,.i46b4d7,.i5dd937,.i5fac00,.i726689,.i76313f,.i794fcf,.i7b0867,.i868fe2,.i925238,.i9503ae,.i95e073,.i99197c,.i9b3fe1,.ia089ac,.ia41e76,.iabec71,.iafa385,.ib7c8bb,.ib7dc09,.ibcfef8,.ibe0d56,.ibe1dab,.ic17bbb,.ica28ad,.icda7f7,.ice4e66,.icef9cd,.icf87fd,.id001ae,.id2abdf,.idd7088,.ideb78b,.ie5bd4f,.ie87617,.iefa302,.if03507,.if27248,.if578c1,.ia3b614,.iaa1795,.id06f6f,.idee7e6,.i6487bd,.i73fdb5,.i974ffe,.i67a70b,.ie2ac9d,.i0cdef6,.ibd885a,.i9e44c5,.i1700ba,.i027843,.i64f6bd,.ib65c95,.ibf28fa,.if46167,.i26b2ad,.i6dd4ad,.i2c4ecd,.iadb5ba,.if0c9cd,.i11e905,.i43d544,.i484495,.i51fea1,.ic75f3e,.iffda36,.i1ae082,.i297c0d,.i2aacdc,.i6a3402,.i94fa9b,.i9973bd,.i1362c8,.i95282c,.i0a1bc4,.i994a43,.i45e4df,.i55e9a2,.i5d2752,.ib39736,.id3fbb2,.id5f4c9,.if5b31b,.i6a3b67,.i98632b,.ia8a2a9,.ib47194,.if9e0d5,.i64260b,.i8b378a,.ia2e71f,.ia850da,.iac7e64,.ic01349,.i7175a2,.i91211b,.ia5c33c,.id9771d,.i1f9ca4,.i736139,.i81a7b6,.i98a7c7,.iaea35f,.ieb3aad,.i1fa22e,.i3360d1,.i820358,.i049b08,.i38390f,.i3af076,.i7e6369,.i9c691c,.ib6eded,.ib9dbe4,.ibbed36,.ic37718,.ieeeff7,.i6f2fa3,.iac4a3d,.i2e800a,.i8fb118,.i5afc22,.i1ee54d,.id12ac8,.idfc529,.ic0bbc9,.i86da64,.i0a58a1,.i0dd734,.i17f8ca,.i19b8c3,.i1d6ea3,.i1edaed,.i20c10c,.i36fd7f,.i3bac35,.i44950e,.i69a741,.i6a3434,.i78cc83,.i7bee3e,.ia9a266,.ib60839,.ic17ac5,.ic4fef3,.icdf675,.id2fc29,.ida42d2,.idca8c8,.iefa815,.if225b6,.if2670d,.ifb37e8,.i83c19a,.i40779a,.i79efa4,.i8d4733,.i920e1f,.ie22516,.iefda08,.i21dd34,.i2ea4d2,.i98c5fd,.id046ae,.idce63b,.i788de8,.i44bfb1,.i18859b,.i0c9ac7,.i6836e1,.i0ca9ea,.i141a67,.i1c85b1,.i1e155d,.i265c6e,.i383cd0,.i383d07,.i3d12fd,.i3df0f6,.i469d6b,.i546d15,.i5ae8ae,.i6af514,.i717a86,.i734ce7,.i8cfa39,.i8e8590,.i9333ee,.ib0530d,.ibb248f,.idae3af,.ie177cf,.i35ae70,.i0e061b,.i43b812,.i68cd7b,.i9ef400,.i78abbc,.i3bac08,.ia546d4,.i9a4419,.ic7f67c,.i8ca1c6,.i4781cd,.ibc1d7d,.ida3af1,.i5e3bf8,.i02908e,.i04fa6e,.i054cd7,.i055d59,.i067acc,.i074eff,.i083a95,.i0986d0,.i0b95ec,.i0bd37e,.i0be11d,.i0bea4a,.i0c222c,.i0d54cc,.i0e0a97,.i0e3bcb,.i0feb62,.i106223,.i119702,.i1278d4,.i133778,.i1413be,.i1460d7,.i14ca96,.i171870,.i1a40f5,.i1b7aee,.i1b88c6,.i1c4b09,.i1d1ffb,.i1d6936,.i1e03fc,.i1e65bf,.i1ecf38,.i21523e,.i21d5ea,.i226713,.i2515f0,.i26926b,.i27ee20,.i2cebb4,.i2eb9cd,.i308582,.i316006,.i328935,.i332790,.i33f032,.i3463e3,.i35789b,.i36b07f,.i36fd5e,.i39bd4a,.i3c9a44,.i3d63ab,.i3e57ad,.i4046a6,.i412b36,.i42e19a,.i48d652,.i49b25f,.i49b3c1,.i49d179,.i4b3b1c,.i4bc550,.i4e48ab,.i516572,.i51bc0f,.i520c91,.i532849,.i53c51e,.i5a99c0,.i5f4f6d,.i625ca9,.i64beed,.i64fa0d,.i651318,.i6529fe,.i673193,.i685baf,.i6adeba,.i6b142f,.i6b22cb,.i6e25e3,.i6f0871,.i6fd4da,.i71c939,.i7218eb,.i724878,.i72551a,.i747acb,.i765967,.i775c76,.i790578,.i7a19ab,.i7a71ce,.i7a9814,.i7b95d5,.i7be161,.i7dfe32,.i806810,.i806e9d,.i80848c,.i817992,.i81a556,.i825ca0,.i82a3df,.i844bfa,.i84a682,.i867236,.i878b38,.i88c8c5,.i892cc5,.i898b27,.i8a9020,.i8b42c7,.i8d98aa,.i8e7253,.i8eecb7,.i8fb14b,.i926775,.i92ebde,.i935eb8,.i960986,.i973624,.i979b9a,.i9c04d8,.i9c4a1f,.i9eb35e,.ia8658b,.iaa5d6b,.iaa9522,.iaaf663,.iab3ccf,.iac539d,.iad184b,.iadaaeb,.iadb642,.ib1fa49,.ib68ad3,.ib9310a,.ib9f81b,.iba86d7,.ibde63b,.ibe0587,.ic00fcf,.ic1a11d,.ic1c81b,.ic2ce9c,.ic56709,.ic75467,.ic77072,.ic770bc,.ic77ab7,.ic7dedd,.ic8ea41,.ic98ba4,.ic9dd1d,.ic9ef1a,.ica7c29,.icadc35,.icc9ffd,.icd7a3e,.icdb1d5,.icdee41,.ice320e,.id08832,.id1ef79,.id66efc,.id6eb62,.id86265,.id889ac,.ida14af,.idb29f7,.ide8554,.ideeae9,.idf0fa7,.idf79c0,.ie06505,.ie1f7f9,.ie4d5eb,.ie4fb3c,.ie6b90d,.ie7a70b,.ie7b3fe,.iece0e0,.ied434f,.ied71d7,.iee636d,.ieec9c7,.if48633,.if720da,.if8d375,.ifb7bb5,.ifd11d2,.iff5fbb,.if2c58a,.ifc3e4a,.ic87aa5,.i3181b3,.i54f4b3,.i43e857,.i8616a0,.if9265d,.id01afc,.i06354e,.i28c107,.i5854bc,.i7bb75b,.ib6f4c5,.if9bf7e,.i6a48c4,.i98fa4a,.iaa6c5e,.ib57933,.i07de08,.i847c86,.ia39ddf,.i321d42,.i64c2c6,.i320ef9,.i3a2451,.i430f5a,.i6683bb,.i008024,.i6006f5,.iff9576,.i019586,.i38fdb9,.i68cf45,.ia40da0,.i355c57,.i7bf20e,.ida680f,.i0f06bb,.i366594,.ib09ebd,.id9c0b1,.i43bb04,.i48c041,.i550c85,.i2df726,.ie7c05b,.iec2ba1,.iac8563,.i71bc67,.i94b269,.id66b94,.i520e25,.i55bfab,.iac7f95,.id41492,.i087d21,.i089f40,.i1773f8,.i19c32a,.i1cb66e,.i3ba32f,.i709343,.i70b77f,.i717cc2,.i91b1e5,.i972279,.ib9364a,.ic8d7c6,.i76dd9a,.ibc00cf,.i31361c,.i9454ec,.ib3b8ed,.id3cbd0,.i168a59,.i373d20,.id77171,.ie48ef7,.i3eff32,.i894760,.ia14483,.i05adc3,.i15485f,.i45aa71,.i19f40b,.i218fe8,.ia38b99,.if9cd76,.i009bbe,.i092ea2,.i187825,.i292e31,.i487125,.i4a02cf,.i547e90,.i55f9ff,.i587c0c,.i640a86,.i781f9f,.i7d580b,.i89d8a1,.i93d728,.i943fab,.i96d9be,.i9cc0d6,.iaaeaf2,.iabd2d9,.iafe6db,.ib1e712,.ib887e3,.ib9edce,.ic0bd68,.ic0cc11,.icc74f3,.ice324e,.ie09550,.ie10015,.ie6ef56,.ie705ff,.if4d4d2,.i5f9b04,.i51282b,.i5ae49d,.i86f6c4,.ia7baee,.ie9b539{background-image:url(atlas-1.png);--aw:510;--ah:343}
+.i365d74{--x:0;--y:0;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.i3729f3{--x:20;--y:0;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.i3785ed{--x:40;--y:0;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.i379ea4{--x:60;--y:0;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.i4581f3{--x:80;--y:0;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.i46b4d7{--x:100;--y:0;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.i5dd937{--x:120;--y:0;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.i5fac00{--x:140;--y:0;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.i726689{--x:160;--y:0;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.i76313f{--x:180;--y:0;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.i794fcf{--x:200;--y:0;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.i7b0867{--x:220;--y:0;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.i868fe2{--x:240;--y:0;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.i925238{--x:260;--y:0;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.i9503ae{--x:280;--y:0;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.i95e073{--x:300;--y:0;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.i99197c{--x:320;--y:0;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.i9b3fe1{--x:340;--y:0;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.ia089ac{--x:360;--y:0;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.ia41e76{--x:380;--y:0;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.iabec71{--x:400;--y:0;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.iafa385{--x:420;--y:0;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.ib7c8bb{--x:440;--y:0;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.ib7dc09{--x:460;--y:0;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.ibcfef8{--x:480;--y:0;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.ibe0d56{--x:0;--y:24;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.ibe1dab{--x:20;--y:24;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.ic17bbb{--x:40;--y:24;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.ica28ad{--x:60;--y:24;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.icda7f7{--x:80;--y:24;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.ice4e66{--x:100;--y:24;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.icef9cd{--x:120;--y:24;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.icf87fd{--x:140;--y:24;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.id001ae{--x:160;--y:24;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.id2abdf{--x:180;--y:24;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.idd7088{--x:200;--y:24;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.ideb78b{--x:220;--y:24;--w:19;--h:23;--k1:1;--k2:1;--k3:3}
+.ie5bd4f{--x:240;--y:24;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.ie87617{--x:260;--y:24;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.iefa302{--x:280;--y:24;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.if03507{--x:300;--y:24;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.if27248{--x:320;--y:24;--w:19;--h:23;--k1:1;--k2:1;--k3:3}
+.if578c1{--x:340;--y:24;--w:19;--h:23;--k1:1;--k2:2;--k3:3}
+.ia3b614{--x:360;--y:24;--w:18;--h:23;--k1:1;--k2:2;--k3:3}
+.iaa1795{--x:379;--y:24;--w:18;--h:23;--k1:1;--k2:1;--k3:3}
+.id06f6f{--x:398;--y:24;--w:18;--h:23;--k1:1;--k2:2;--k3:3}
+.idee7e6{--x:417;--y:24;--w:18;--h:23;--k1:1;--k2:2;--k3:3}
+.i6487bd{--x:436;--y:24;--w:17;--h:23;--k1:1;--k2:2;--k3:3}
+.i73fdb5{--x:454;--y:24;--w:17;--h:23;--k1:1;--k2:2;--k3:4}
+.i974ffe{--x:472;--y:24;--w:17;--h:23;--k1:1;--k2:2;--k3:4}
+.i67a70b{--x:490;--y:24;--w:16;--h:23;--k1:1;--k2:1;--k3:3}
+.ie2ac9d{--x:0;--y:48;--w:16;--h:23;--k1:1;--k2:2;--k3:3}
+.i0cdef6{--x:17;--y:48;--w:15;--h:23;--k1:1;--k2:2;--k3:3}
+.ibd885a{--x:33;--y:48;--w:14;--h:23;--k1:1;--k2:2;--k3:2}
+.i9e44c5{--x:48;--y:48;--w:13;--h:23;--k1:1;--k2:1;--k3:3}
+.i1700ba{--x:62;--y:48;--w:27;--h:22;--k1:1;--k2:1;--k3:2}
+.i027843{--x:90;--y:48;--w:22;--h:22;--k1:1;--k2:1;--k3:3}
+.i64f6bd{--x:113;--y:48;--w:22;--h:22;--k1:1;--k2:1;--k3:3}
+.ib65c95{--x:136;--y:48;--w:22;--h:22;--k1:1;--k2:1;--k3:3}
+.ibf28fa{--x:159;--y:48;--w:22;--h:22;--k1:1;--k2:1;--k3:3}
+.if46167{--x:182;--y:48;--w:21;--h:22;--k1:1;--k2:1;--k3:3}
+.i26b2ad{--x:204;--y:48;--w:19;--h:22;--k1:1;--k2:2;--k3:4}
+.i6dd4ad{--x:224;--y:48;--w:19;--h:22;--k1:1;--k2:2;--k3:4}
+.i2c4ecd{--x:244;--y:48;--w:18;--h:22;--k1:1;--k2:2;--k3:3}
+.iadb5ba{--x:263;--y:48;--w:18;--h:22;--k1:1;--k2:2;--k3:3}
+.if0c9cd{--x:282;--y:48;--w:18;--h:22;--k1:1;--k2:1;--k3:3}
+.i11e905{--x:301;--y:48;--w:17;--h:22;--k1:1;--k2:2;--k3:4}
+.i43d544{--x:319;--y:48;--w:17;--h:22;--k1:1;--k2:2;--k3:4}
+.i484495{--x:337;--y:48;--w:17;--h:22;--k1:1;--k2:2;--k3:3}
+.i51fea1{--x:355;--y:48;--w:17;--h:22;--k1:1;--k2:1;--k3:3}
+.ic75f3e{--x:373;--y:48;--w:17;--h:22;--k1:1;--k2:2;--k3:3}
+.iffda36{--x:391;--y:48;--w:17;--h:22;--k1:1;--k2:2;--k3:4}
+.i1ae082{--x:409;--y:48;--w:16;--h:22;--k1:1;--k2:2;--k3:3}
+.i297c0d{--x:426;--y:48;--w:16;--h:22;--k1:1;--k2:2;--k3:3}
+.i2aacdc{--x:443;--y:48;--w:16;--h:22;--k1:1;--k2:2;--k3:3}
+.i6a3402{--x:460;--y:48;--w:16;--h:22;--k1:1;--k2:2;--k3:4}
+.i94fa9b{--x:477;--y:48;--w:16;--h:22;--k1:1;--k2:2;--k3:3}
+.i9973bd{--x:494;--y:48;--w:16;--h:22;--k1:1;--k2:2;--k3:3}
+.i1362c8{--x:0;--y:72;--w:15;--h:22;--k1:1;--k2:2;--k3:3}
+.i95282c{--x:16;--y:72;--w:24;--h:21;--k1:1;--k2:1;--k3:3}
+.i0a1bc4{--x:41;--y:72;--w:23;--h:21;--k1:1;--k2:1;--k3:3}
+.i994a43{--x:65;--y:72;--w:23;--h:21;--k1:1;--k2:2;--k3:3}
+.i45e4df{--x:89;--y:72;--w:22;--h:21;--k1:1;--k2:1;--k3:3}
+.i55e9a2{--x:112;--y:72;--w:21;--h:21;--k1:1;--k2:2;--k3:3}
+.i5d2752{--x:134;--y:72;--w:18;--h:21;--k1:1;--k2:2;--k3:3}
+.ib39736{--x:153;--y:72;--w:18;--h:21;--k1:1;--k2:2;--k3:3}
+.id3fbb2{--x:172;--y:72;--w:18;--h:21;--k1:1;--k2:2;--k3:3}
+.id5f4c9{--x:191;--y:72;--w:18;--h:21;--k1:1;--k2:2;--k3:3}
+.if5b31b{--x:210;--y:72;--w:18;--h:21;--k1:1;--k2:2;--k3:3}
+.i6a3b67{--x:229;--y:72;--w:17;--h:21;--k1:1;--k2:2;--k3:3}
+.i98632b{--x:247;--y:72;--w:17;--h:21;--k1:1;--k2:2;--k3:4}
+.ia8a2a9{--x:265;--y:72;--w:17;--h:21;--k1:1;--k2:2;--k3:4}
+.ib47194{--x:283;--y:72;--w:17;--h:21;--k1:1;--k2:2;--k3:4}
+.if9e0d5{--x:301;--y:72;--w:17;--h:21;--k1:1;--k2:2;--k3:3}
+.i64260b{--x:319;--y:72;--w:16;--h:21;--k1:1;--k2:2;--k3:3}
+.i8b378a{--x:336;--y:72;--w:16;--h:21;--k1:1;--k2:2;--k3:3}
+.ia2e71f{--x:353;--y:72;--w:16;--h:21;--k1:1;--k2:2;--k3:3}
+.ia850da{--x:370;--y:72;--w:16;--h:21;--k1:1;--k2:2;--k3:3}
+.iac7e64{--x:387;--y:72;--w:16;--h:21;--k1:1;--k2:2;--k3:3}
+.ic01349{--x:404;--y:72;--w:16;--h:21;--k1:1;--k2:2;--k3:3}
+.i7175a2{--x:421;--y:72;--w:24;--h:20;--k1:1;--k2:1;--k3:3}
+.i91211b{--x:446;--y:72;--w:24;--h:20;--k1:1;--k2:1;--k3:3}
+.ia5c33c{--x:471;--y:72;--w:24;--h:20;--k1:1;--k2:1;--k3:3}
+.id9771d{--x:0;--y:95;--w:23;--h:20;--k1:1;--k2:2;--k3:4}
+.i1f9ca4{--x:24;--y:95;--w:19;--h:20;--k1:1;--k2:2;--k3:3}
+.i736139{--x:44;--y:95;--w:18;--h:20;--k1:1;--k2:2;--k3:3}
+.i81a7b6{--x:63;--y:95;--w:18;--h:20;--k1:1;--k2:2;--k3:3}
+.i98a7c7{--x:82;--y:95;--w:18;--h:20;--k1:1;--k2:2;--k3:3}
+.iaea35f{--x:101;--y:95;--w:18;--h:20;--k1:1;--k2:2;--k3:3}
+.ieb3aad{--x:120;--y:95;--w:18;--h:20;--k1:1;--k2:2;--k3:3}
+.i1fa22e{--x:139;--y:95;--w:17;--h:20;--k1:1;--k2:2;--k3:3}
+.i3360d1{--x:157;--y:95;--w:17;--h:20;--k1:1;--k2:2;--k3:4}
+.i820358{--x:175;--y:95;--w:17;--h:20;--k1:1;--k2:2;--k3:3}
+.i049b08{--x:193;--y:95;--w:16;--h:20;--k1:1;--k2:2;--k3:3}
+.i38390f{--x:210;--y:95;--w:16;--h:20;--k1:1;--k2:2;--k3:3}
+.i3af076{--x:227;--y:95;--w:16;--h:20;--k1:1;--k2:2;--k3:3}
+.i7e6369{--x:244;--y:95;--w:16;--h:20;--k1:1;--k2:2;--k3:3}
+.i9c691c{--x:261;--y:95;--w:16;--h:20;--k1:1;--k2:2;--k3:3}
+.ib6eded{--x:278;--y:95;--w:16;--h:20;--k1:1;--k2:2;--k3:3}
+.ib9dbe4{--x:295;--y:95;--w:16;--h:20;--k1:1;--k2:2;--k3:3}
+.ibbed36{--x:312;--y:95;--w:16;--h:20;--k1:1;--k2:2;--k3:3}
+.ic37718{--x:329;--y:95;--w:16;--h:20;--k1:1;--k2:2;--k3:3}
+.ieeeff7{--x:346;--y:95;--w:16;--h:20;--k1:1;--k2:2;--k3:3}
+.i6f2fa3{--x:363;--y:95;--w:15;--h:20;--k1:1;--k2:2;--k3:4}
+.iac4a3d{--x:379;--y:95;--w:15;--h:20;--k1:1;--k2:2;--k3:3}
+.i2e800a{--x:395;--y:95;--w:26;--h:19;--k1:1;--k2:1;--k3:2}
+.i8fb118{--x:422;--y:95;--w:26;--h:19;--k1:1;--k2:1;--k3:2}
+.i5afc22{--x:449;--y:95;--w:23;--h:19;--k1:1;--k2:1;--k3:3}
+.i1ee54d{--x:473;--y:95;--w:22;--h:19;--k1:1;--k2:1;--k3:3}
+.id12ac8{--x:0;--y:116;--w:22;--h:19;--k1:1;--k2:2;--k3:3}
+.idfc529{--x:23;--y:116;--w:22;--h:19;--k1:1;--k2:1;--k3:3}
+.ic0bbc9{--x:46;--y:116;--w:21;--h:19;--k1:1;--k2:2;--k3:3}
+.i86da64{--x:68;--y:116;--w:19;--h:19;--k1:1;--k2:2;--k3:3}
+.i0a58a1{--x:88;--y:116;--w:18;--h:19;--k1:1;--k2:2;--k3:3}
+.i0dd734{--x:107;--y:116;--w:18;--h:19;--k1:1;--k2:2;--k3:3}
+.i17f8ca{--x:126;--y:116;--w:18;--h:19;--k1:1;--k2:2;--k3:3}
+.i19b8c3{--x:145;--y:116;--w:18;--h:19;--k1:1;--k2:2;--k3:3}
+.i1d6ea3{--x:164;--y:116;--w:18;--h:19;--k1:1;--k2:2;--k3:3}
+.i1edaed{--x:183;--y:116;--w:18;--h:19;--k1:1;--k2:2;--k3:3}
+.i20c10c{--x:202;--y:116;--w:18;--h:19;--k1:1;--k2:2;--k3:3}
+.i36fd7f{--x:221;--y:116;--w:18;--h:19;--k1:1;--k2:2;--k3:3}
+.i3bac35{--x:240;--y:116;--w:18;--h:19;--k1:1;--k2:2;--k3:3}
+.i44950e{--x:259;--y:116;--w:18;--h:19;--k1:1;--k2:2;--k3:3}
+.i69a741{--x:278;--y:116;--w:18;--h:19;--k1:1;--k2:2;--k3:3}
+.i6a3434{--x:297;--y:116;--w:18;--h:19;--k1:1;--k2:2;--k3:3}
+.i78cc83{--x:316;--y:116;--w:18;--h:19;--k1:1;--k2:2;--k3:3}
+.i7bee3e{--x:335;--y:116;--w:18;--h:19;--k1:1;--k2:2;--k3:3}
+.ia9a266{--x:354;--y:116;--w:18;--h:19;--k1:1;--k2:2;--k3:3}
+.ib60839{--x:373;--y:116;--w:18;--h:19;--k1:1;--k2:2;--k3:3}
+.ic17ac5{--x:392;--y:116;--w:18;--h:19;--k1:1;--k2:2;--k3:3}
+.ic4fef3{--x:411;--y:116;--w:18;--h:19;--k1:1;--k2:2;--k3:3}
+.icdf675{--x:430;--y:116;--w:18;--h:19;--k1:1;--k2:2;--k3:3}
+.id2fc29{--x:449;--y:116;--w:18;--h:19;--k1:1;--k2:2;--k3:3}
+.ida42d2{--x:468;--y:116;--w:18;--h:19;--k1:1;--k2:2;--k3:3}
+.idca8c8{--x:487;--y:116;--w:18;--h:19;--k1:1;--k2:2;--k3:3}
+.iefa815{--x:0;--y:136;--w:18;--h:19;--k1:1;--k2:2;--k3:3}
+.if225b6{--x:19;--y:136;--w:18;--h:19;--k1:1;--k2:2;--k3:3}
+.if2670d{--x:38;--y:136;--w:18;--h:19;--k1:1;--k2:2;--k3:3}
+.ifb37e8{--x:57;--y:136;--w:18;--h:19;--k1:1;--k2:2;--k3:3}
+.i83c19a{--x:76;--y:136;--w:17;--h:19;--k1:1;--k2:2;--k3:3}
+.i40779a{--x:94;--y:136;--w:16;--h:19;--k1:1;--k2:2;--k3:3}
+.i79efa4{--x:111;--y:136;--w:16;--h:19;--k1:1;--k2:2;--k3:3}
+.i8d4733{--x:128;--y:136;--w:16;--h:19;--k1:1;--k2:2;--k3:3}
+.i920e1f{--x:145;--y:136;--w:16;--h:19;--k1:1;--k2:2;--k3:3}
+.ie22516{--x:162;--y:136;--w:16;--h:19;--k1:1;--k2:2;--k3:3}
+.iefda08{--x:179;--y:136;--w:16;--h:19;--k1:1;--k2:2;--k3:3}
+.i21dd34{--x:196;--y:136;--w:15;--h:19;--k1:1;--k2:2;--k3:3}
+.i2ea4d2{--x:212;--y:136;--w:15;--h:19;--k1:1;--k2:2;--k3:3}
+.i98c5fd{--x:228;--y:136;--w:15;--h:19;--k1:1;--k2:2;--k3:3}
+.id046ae{--x:244;--y:136;--w:15;--h:19;--k1:1;--k2:2;--k3:4}
+.idce63b{--x:260;--y:136;--w:15;--h:19;--k1:1;--k2:2;--k3:3}
+.i788de8{--x:276;--y:136;--w:13;--h:19;--k1:1;--k2:2;--k3:3}
+.i44bfb1{--x:290;--y:136;--w:33;--h:18;--k1:1;--k2:1;--k3:2}
+.i18859b{--x:324;--y:136;--w:21;--h:18;--k1:1;--k2:2;--k3:3}
+.i0c9ac7{--x:346;--y:136;--w:20;--h:18;--k1:1;--k2:2;--k3:3}
+.i6836e1{--x:367;--y:136;--w:20;--h:18;--k1:1;--k2:2;--k3:3}
+.i0ca9ea{--x:388;--y:136;--w:18;--h:18;--k1:1;--k2:2;--k3:4}
+.i141a67{--x:407;--y:136;--w:18;--h:18;--k1:1;--k2:2;--k3:4}
+.i1c85b1{--x:426;--y:136;--w:18;--h:18;--k1:1;--k2:2;--k3:4}
+.i1e155d{--x:445;--y:136;--w:18;--h:18;--k1:1;--k2:2;--k3:4}
+.i265c6e{--x:464;--y:136;--w:18;--h:18;--k1:1;--k2:2;--k3:4}
+.i383cd0{--x:483;--y:136;--w:18;--h:18;--k1:1;--k2:2;--k3:4}
+.i383d07{--x:0;--y:156;--w:18;--h:18;--k1:1;--k2:2;--k3:4}
+.i3d12fd{--x:19;--y:156;--w:18;--h:18;--k1:1;--k2:2;--k3:4}
+.i3df0f6{--x:38;--y:156;--w:18;--h:18;--k1:1;--k2:2;--k3:4}
+.i469d6b{--x:57;--y:156;--w:18;--h:18;--k1:1;--k2:2;--k3:4}
+.i546d15{--x:76;--y:156;--w:18;--h:18;--k1:1;--k2:2;--k3:4}
+.i5ae8ae{--x:95;--y:156;--w:18;--h:18;--k1:1;--k2:2;--k3:4}
+.i6af514{--x:114;--y:156;--w:18;--h:18;--k1:1;--k2:2;--k3:4}
+.i717a86{--x:133;--y:156;--w:18;--h:18;--k1:1;--k2:2;--k3:4}
+.i734ce7{--x:152;--y:156;--w:18;--h:18;--k1:1;--k2:2;--k3:4}
+.i8cfa39{--x:171;--y:156;--w:18;--h:18;--k1:1;--k2:2;--k3:4}
+.i8e8590{--x:190;--y:156;--w:18;--h:18;--k1:1;--k2:2;--k3:4}
+.i9333ee{--x:209;--y:156;--w:18;--h:18;--k1:1;--k2:2;--k3:4}
+.ib0530d{--x:228;--y:156;--w:18;--h:18;--k1:1;--k2:2;--k3:4}
+.ibb248f{--x:247;--y:156;--w:18;--h:18;--k1:1;--k2:2;--k3:4}
+.idae3af{--x:266;--y:156;--w:18;--h:18;--k1:1;--k2:2;--k3:4}
+.ie177cf{--x:285;--y:156;--w:18;--h:18;--k1:1;--k2:2;--k3:4}
+.i35ae70{--x:304;--y:156;--w:17;--h:18;--k1:1;--k2:2;--k3:4}
+.i0e061b{--x:322;--y:156;--w:30;--h:17;--k1:1;--k2:1;--k3:2}
+.i43b812{--x:353;--y:156;--w:30;--h:17;--k1:1;--k2:1;--k3:2}
+.i68cd7b{--x:384;--y:156;--w:30;--h:17;--k1:1;--k2:1;--k3:2}
+.i9ef400{--x:415;--y:156;--w:30;--h:17;--k1:1;--k2:1;--k3:2}
+.i78abbc{--x:446;--y:156;--w:27;--h:17;--k1:1;--k2:1;--k3:2}
+.i3bac08{--x:474;--y:156;--w:19;--h:17;--k1:1;--k2:2;--k3:3}
+.ia546d4{--x:0;--y:175;--w:19;--h:17;--k1:1;--k2:2;--k3:3}
+.i9a4419{--x:20;--y:175;--w:16;--h:17;--k1:1;--k2:2;--k3:3}
+.ic7f67c{--x:37;--y:175;--w:16;--h:17;--k1:1;--k2:2;--k3:4}
+.i8ca1c6{--x:54;--y:175;--w:13;--h:17;--k1:1;--k2:2;--k3:3}
+.i4781cd{--x:68;--y:175;--w:24;--h:16;--k1:1;--k2:1;--k3:3}
+.ibc1d7d{--x:93;--y:175;--w:23;--h:16;--k1:1;--k2:2;--k3:3}
+.ida3af1{--x:117;--y:175;--w:21;--h:16;--k1:1;--k2:2;--k3:3}
+.i5e3bf8{--x:139;--y:175;--w:18;--h:16;--k1:1;--k2:2;--k3:4}
+.i02908e{--x:158;--y:175;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i04fa6e{--x:175;--y:175;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i054cd7{--x:192;--y:175;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i055d59{--x:209;--y:175;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i067acc{--x:226;--y:175;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i074eff{--x:243;--y:175;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i083a95{--x:260;--y:175;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i0986d0{--x:277;--y:175;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i0b95ec{--x:294;--y:175;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i0bd37e{--x:311;--y:175;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i0be11d{--x:328;--y:175;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i0bea4a{--x:345;--y:175;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i0c222c{--x:362;--y:175;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i0d54cc{--x:379;--y:175;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i0e0a97{--x:396;--y:175;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i0e3bcb{--x:413;--y:175;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i0feb62{--x:430;--y:175;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i106223{--x:447;--y:175;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i119702{--x:464;--y:175;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i1278d4{--x:481;--y:175;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i133778{--x:0;--y:193;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i1413be{--x:17;--y:193;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i1460d7{--x:34;--y:193;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i14ca96{--x:51;--y:193;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i171870{--x:68;--y:193;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i1a40f5{--x:85;--y:193;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i1b7aee{--x:102;--y:193;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i1b88c6{--x:119;--y:193;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i1c4b09{--x:136;--y:193;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i1d1ffb{--x:153;--y:193;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i1d6936{--x:170;--y:193;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i1e03fc{--x:187;--y:193;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i1e65bf{--x:204;--y:193;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i1ecf38{--x:221;--y:193;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i21523e{--x:238;--y:193;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i21d5ea{--x:255;--y:193;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i226713{--x:272;--y:193;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i2515f0{--x:289;--y:193;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i26926b{--x:306;--y:193;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i27ee20{--x:323;--y:193;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i2cebb4{--x:340;--y:193;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i2eb9cd{--x:357;--y:193;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i308582{--x:374;--y:193;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i316006{--x:391;--y:193;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i328935{--x:408;--y:193;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i332790{--x:425;--y:193;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i33f032{--x:442;--y:193;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i3463e3{--x:459;--y:193;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i35789b{--x:476;--y:193;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i36b07f{--x:493;--y:193;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i36fd5e{--x:0;--y:210;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i39bd4a{--x:17;--y:210;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i3c9a44{--x:34;--y:210;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i3d63ab{--x:51;--y:210;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i3e57ad{--x:68;--y:210;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i4046a6{--x:85;--y:210;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i412b36{--x:102;--y:210;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i42e19a{--x:119;--y:210;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i48d652{--x:136;--y:210;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i49b25f{--x:153;--y:210;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i49b3c1{--x:170;--y:210;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i49d179{--x:187;--y:210;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i4b3b1c{--x:204;--y:210;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i4bc550{--x:221;--y:210;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i4e48ab{--x:238;--y:210;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i516572{--x:255;--y:210;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i51bc0f{--x:272;--y:210;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i520c91{--x:289;--y:210;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i532849{--x:306;--y:210;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i53c51e{--x:323;--y:210;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i5a99c0{--x:340;--y:210;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i5f4f6d{--x:357;--y:210;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i625ca9{--x:374;--y:210;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i64beed{--x:391;--y:210;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i64fa0d{--x:408;--y:210;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i651318{--x:425;--y:210;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i6529fe{--x:442;--y:210;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i673193{--x:459;--y:210;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i685baf{--x:476;--y:210;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i6adeba{--x:493;--y:210;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i6b142f{--x:0;--y:227;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i6b22cb{--x:17;--y:227;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i6e25e3{--x:34;--y:227;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i6f0871{--x:51;--y:227;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i6fd4da{--x:68;--y:227;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i71c939{--x:85;--y:227;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i7218eb{--x:102;--y:227;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i724878{--x:119;--y:227;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i72551a{--x:136;--y:227;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i747acb{--x:153;--y:227;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i765967{--x:170;--y:227;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i775c76{--x:187;--y:227;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i790578{--x:204;--y:227;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i7a19ab{--x:221;--y:227;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i7a71ce{--x:238;--y:227;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i7a9814{--x:255;--y:227;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i7b95d5{--x:272;--y:227;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i7be161{--x:289;--y:227;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i7dfe32{--x:306;--y:227;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i806810{--x:323;--y:227;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i806e9d{--x:340;--y:227;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i80848c{--x:357;--y:227;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i817992{--x:374;--y:227;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i81a556{--x:391;--y:227;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i825ca0{--x:408;--y:227;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i82a3df{--x:425;--y:227;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i844bfa{--x:442;--y:227;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i84a682{--x:459;--y:227;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i867236{--x:476;--y:227;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i878b38{--x:493;--y:227;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i88c8c5{--x:0;--y:244;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i892cc5{--x:17;--y:244;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i898b27{--x:34;--y:244;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i8a9020{--x:51;--y:244;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i8b42c7{--x:68;--y:244;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i8d98aa{--x:85;--y:244;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i8e7253{--x:102;--y:244;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i8eecb7{--x:119;--y:244;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i8fb14b{--x:136;--y:244;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i926775{--x:153;--y:244;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i92ebde{--x:170;--y:244;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i935eb8{--x:187;--y:244;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i960986{--x:204;--y:244;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i973624{--x:221;--y:244;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i979b9a{--x:238;--y:244;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i9c04d8{--x:255;--y:244;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i9c4a1f{--x:272;--y:244;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.i9eb35e{--x:289;--y:244;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ia8658b{--x:306;--y:244;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.iaa5d6b{--x:323;--y:244;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.iaa9522{--x:340;--y:244;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.iaaf663{--x:357;--y:244;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.iab3ccf{--x:374;--y:244;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.iac539d{--x:391;--y:244;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.iad184b{--x:408;--y:244;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.iadaaeb{--x:425;--y:244;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.iadb642{--x:442;--y:244;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ib1fa49{--x:459;--y:244;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ib68ad3{--x:476;--y:244;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ib9310a{--x:493;--y:244;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ib9f81b{--x:0;--y:261;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.iba86d7{--x:17;--y:261;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ibde63b{--x:34;--y:261;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ibe0587{--x:51;--y:261;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ic00fcf{--x:68;--y:261;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ic1a11d{--x:85;--y:261;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ic1c81b{--x:102;--y:261;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ic2ce9c{--x:119;--y:261;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ic56709{--x:136;--y:261;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ic75467{--x:153;--y:261;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ic77072{--x:170;--y:261;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ic770bc{--x:187;--y:261;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ic77ab7{--x:204;--y:261;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ic7dedd{--x:221;--y:261;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ic8ea41{--x:238;--y:261;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ic98ba4{--x:255;--y:261;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ic9dd1d{--x:272;--y:261;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ic9ef1a{--x:289;--y:261;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ica7c29{--x:306;--y:261;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.icadc35{--x:323;--y:261;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.icc9ffd{--x:340;--y:261;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.icd7a3e{--x:357;--y:261;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.icdb1d5{--x:374;--y:261;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.icdee41{--x:391;--y:261;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ice320e{--x:408;--y:261;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.id08832{--x:425;--y:261;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.id1ef79{--x:442;--y:261;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.id66efc{--x:459;--y:261;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.id6eb62{--x:476;--y:261;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.id86265{--x:493;--y:261;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.id889ac{--x:0;--y:278;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ida14af{--x:17;--y:278;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.idb29f7{--x:34;--y:278;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ide8554{--x:51;--y:278;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ideeae9{--x:68;--y:278;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.idf0fa7{--x:85;--y:278;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.idf79c0{--x:102;--y:278;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ie06505{--x:119;--y:278;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ie1f7f9{--x:136;--y:278;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ie4d5eb{--x:153;--y:278;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ie4fb3c{--x:170;--y:278;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ie6b90d{--x:187;--y:278;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ie7a70b{--x:204;--y:278;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ie7b3fe{--x:221;--y:278;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.iece0e0{--x:238;--y:278;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ied434f{--x:255;--y:278;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ied71d7{--x:272;--y:278;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.iee636d{--x:289;--y:278;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ieec9c7{--x:306;--y:278;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.if48633{--x:323;--y:278;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.if720da{--x:340;--y:278;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.if8d375{--x:357;--y:278;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ifb7bb5{--x:374;--y:278;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.ifd11d2{--x:391;--y:278;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.iff5fbb{--x:408;--y:278;--w:16;--h:16;--k1:1;--k2:2;--k3:4}
+.if2c58a{--x:425;--y:278;--w:14;--h:16;--k1:1;--k2:2;--k3:3}
+.ifc3e4a{--x:440;--y:278;--w:23;--h:15;--k1:1;--k2:2;--k3:3}
+.ic87aa5{--x:464;--y:278;--w:19;--h:15;--k1:1;--k2:2;--k3:3}
+.i3181b3{--x:484;--y:278;--w:17;--h:15;--k1:1;--k2:2;--k3:4}
+.i54f4b3{--x:0;--y:295;--w:17;--h:15;--k1:1;--k2:2;--k3:3}
+.i43e857{--x:18;--y:295;--w:16;--h:15;--k1:1;--k2:2;--k3:3}
+.i8616a0{--x:35;--y:295;--w:15;--h:15;--k1:1;--k2:2;--k3:4}
+.if9265d{--x:51;--y:295;--w:15;--h:15;--k1:1;--k2:2;--k3:2}
+.id01afc{--x:67;--y:295;--w:23;--h:14;--k1:1;--k2:1;--k3:3}
+.i06354e{--x:91;--y:295;--w:17;--h:14;--k1:1;--k2:2;--k3:4}
+.i28c107{--x:109;--y:295;--w:17;--h:14;--k1:1;--k2:2;--k3:3}
+.i5854bc{--x:127;--y:295;--w:17;--h:14;--k1:1;--k2:2;--k3:4}
+.i7bb75b{--x:145;--y:295;--w:17;--h:14;--k1:1;--k2:2;--k3:4}
+.ib6f4c5{--x:163;--y:295;--w:17;--h:14;--k1:1;--k2:2;--k3:4}
+.if9bf7e{--x:181;--y:295;--w:15;--h:14;--k1:1;--k2:2;--k3:3}
+.i6a48c4{--x:197;--y:295;--w:14;--h:14;--k1:1;--k2:2;--k3:5}
+.i98fa4a{--x:212;--y:295;--w:14;--h:14;--k1:1;--k2:2;--k3:5}
+.iaa6c5e{--x:227;--y:295;--w:54;--h:13;--k1:1;--k2:1;--k3:1}
+.ib57933{--x:282;--y:295;--w:54;--h:13;--k1:1;--k2:1;--k3:1}
+.i07de08{--x:337;--y:295;--w:32;--h:13;--k1:1;--k2:1;--k3:2}
+.i847c86{--x:370;--y:295;--w:30;--h:13;--k1:1;--k2:1;--k3:2}
+.ia39ddf{--x:401;--y:295;--w:25;--h:13;--k1:1;--k2:1;--k3:3}
+.i321d42{--x:427;--y:295;--w:19;--h:13;--k1:1;--k2:2;--k3:3}
+.i64c2c6{--x:447;--y:295;--w:19;--h:13;--k1:1;--k2:2;--k3:3}
+.i320ef9{--x:467;--y:295;--w:17;--h:13;--k1:1;--k2:2;--k3:3}
+.i3a2451{--x:485;--y:295;--w:17;--h:13;--k1:1;--k2:2;--k3:3}
+.i430f5a{--x:0;--y:311;--w:17;--h:13;--k1:1;--k2:2;--k3:3}
+.i6683bb{--x:18;--y:311;--w:23;--h:12;--k1:1;--k2:2;--k3:3}
+.i008024{--x:42;--y:311;--w:17;--h:12;--k1:1;--k2:2;--k3:3}
+.i6006f5{--x:60;--y:311;--w:17;--h:12;--k1:1;--k2:2;--k3:3}
+.iff9576{--x:78;--y:311;--w:17;--h:12;--k1:1;--k2:2;--k3:4}
+.i019586{--x:96;--y:311;--w:15;--h:12;--k1:1;--k2:2;--k3:3}
+.i38fdb9{--x:112;--y:311;--w:15;--h:12;--k1:1;--k2:2;--k3:3}
+.i68cf45{--x:128;--y:311;--w:15;--h:12;--k1:1;--k2:2;--k3:3}
+.ia40da0{--x:144;--y:311;--w:13;--h:12;--k1:1;--k2:2;--k3:5}
+.i355c57{--x:158;--y:311;--w:12;--h:12;--k1:1;--k2:3;--k3:5}
+.i7bf20e{--x:171;--y:311;--w:12;--h:12;--k1:1;--k2:3;--k3:5}
+.ida680f{--x:184;--y:311;--w:12;--h:12;--k1:1;--k2:3;--k3:5}
+.i0f06bb{--x:197;--y:311;--w:11;--h:12;--k1:1;--k2:3;--k3:5}
+.i366594{--x:209;--y:311;--w:11;--h:12;--k1:1;--k2:3;--k3:5}
+.ib09ebd{--x:221;--y:311;--w:11;--h:12;--k1:1;--k2:2;--k3:2}
+.id9c0b1{--x:233;--y:311;--w:15;--h:11;--k1:1;--k2:2;--k3:4}
+.i43bb04{--x:249;--y:311;--w:11;--h:11;--k1:1;--k2:3;--k3:6}
+.i48c041{--x:261;--y:311;--w:15;--h:10;--k1:1;--k2:2;--k3:4}
+.i550c85{--x:277;--y:311;--w:12;--h:10;--k1:1;--k2:3;--k3:5}
+.i2df726{--x:290;--y:311;--w:11;--h:10;--k1:1;--k2:3;--k3:6}
+.ie7c05b{--x:302;--y:311;--w:11;--h:10;--k1:1;--k2:3;--k3:6}
+.iec2ba1{--x:314;--y:311;--w:11;--h:10;--k1:1;--k2:3;--k3:6}
+.iac8563{--x:326;--y:311;--w:10;--h:10;--k1:2;--k2:3;--k3:6}
+.i71bc67{--x:337;--y:311;--w:8;--h:10;--k1:1;--k2:2;--k3:2}
+.i94b269{--x:346;--y:311;--w:13;--h:9;--k1:1;--k2:2;--k3:5}
+.id66b94{--x:360;--y:311;--w:13;--h:9;--k1:1;--k2:2;--k3:5}
+.i520e25{--x:374;--y:311;--w:12;--h:9;--k1:2;--k2:3;--k3:4}
+.i55bfab{--x:387;--y:311;--w:12;--h:9;--k1:2;--k2:3;--k3:4}
+.iac7f95{--x:400;--y:311;--w:12;--h:9;--k1:2;--k2:3;--k3:4}
+.id41492{--x:413;--y:311;--w:12;--h:9;--k1:2;--k2:3;--k3:4}
+.i087d21{--x:426;--y:311;--w:11;--h:9;--k1:1;--k2:3;--k3:6}
+.i089f40{--x:438;--y:311;--w:11;--h:9;--k1:1;--k2:3;--k3:6}
+.i1773f8{--x:450;--y:311;--w:11;--h:9;--k1:1;--k2:3;--k3:6}
+.i19c32a{--x:462;--y:311;--w:11;--h:9;--k1:1;--k2:3;--k3:6}
+.i1cb66e{--x:474;--y:311;--w:11;--h:9;--k1:1;--k2:3;--k3:6}
+.i3ba32f{--x:486;--y:311;--w:11;--h:9;--k1:1;--k2:3;--k3:6}
+.i709343{--x:498;--y:311;--w:11;--h:9;--k1:1;--k2:3;--k3:6}
+.i70b77f{--x:0;--y:325;--w:11;--h:9;--k1:1;--k2:3;--k3:6}
+.i717cc2{--x:12;--y:325;--w:11;--h:9;--k1:1;--k2:3;--k3:6}
+.i91b1e5{--x:24;--y:325;--w:11;--h:9;--k1:1;--k2:3;--k3:6}
+.i972279{--x:36;--y:325;--w:11;--h:9;--k1:1;--k2:3;--k3:6}
+.ib9364a{--x:48;--y:325;--w:11;--h:9;--k1:1;--k2:3;--k3:6}
+.ic8d7c6{--x:60;--y:325;--w:11;--h:9;--k1:1;--k2:3;--k3:6}
+.i76dd9a{--x:72;--y:325;--w:10;--h:9;--k1:2;--k2:3;--k3:6}
+.ibc00cf{--x:83;--y:325;--w:10;--h:9;--k1:2;--k2:3;--k3:6}
+.i31361c{--x:94;--y:325;--w:9;--h:9;--k1:2;--k2:4;--k3:7}
+.i9454ec{--x:104;--y:325;--w:9;--h:9;--k1:2;--k2:4;--k3:7}
+.ib3b8ed{--x:114;--y:325;--w:9;--h:9;--k1:2;--k2:4;--k3:7}
+.id3cbd0{--x:124;--y:325;--w:9;--h:9;--k1:2;--k2:4;--k3:7}
+.i168a59{--x:134;--y:325;--w:8;--h:9;--k1:2;--k2:3;--k3:4}
+.i373d20{--x:143;--y:325;--w:8;--h:9;--k1:2;--k2:3;--k3:4}
+.id77171{--x:152;--y:325;--w:8;--h:9;--k1:2;--k2:3;--k3:4}
+.ie48ef7{--x:161;--y:325;--w:8;--h:9;--k1:2;--k2:3;--k3:4}
+.i3eff32{--x:170;--y:325;--w:7;--h:9;--k1:2;--k2:3;--k3:4}
+.i894760{--x:178;--y:325;--w:7;--h:9;--k1:2;--k2:3;--k3:4}
+.ia14483{--x:186;--y:325;--w:7;--h:9;--k1:2;--k2:3;--k3:4}
+.i05adc3{--x:194;--y:325;--w:16;--h:8;--k1:1;--k2:2;--k3:4}
+.i15485f{--x:211;--y:325;--w:13;--h:8;--k1:2;--k2:3;--k3:4}
+.i45aa71{--x:225;--y:325;--w:13;--h:8;--k1:2;--k2:3;--k3:4}
+.i19f40b{--x:239;--y:325;--w:9;--h:8;--k1:2;--k2:3;--k3:4}
+.i218fe8{--x:249;--y:325;--w:8;--h:8;--k1:2;--k2:3;--k3:4}
+.ia38b99{--x:258;--y:325;--w:8;--h:8;--k1:2;--k2:3;--k3:4}
+.if9cd76{--x:267;--y:325;--w:8;--h:8;--k1:2;--k2:4;--k3:8}
+.i009bbe{--x:276;--y:325;--w:7;--h:8;--k1:2;--k2:3;--k3:4}
+.i092ea2{--x:284;--y:325;--w:7;--h:8;--k1:2;--k2:3;--k3:4}
+.i187825{--x:292;--y:325;--w:7;--h:8;--k1:2;--k2:3;--k3:4}
+.i292e31{--x:300;--y:325;--w:7;--h:8;--k1:2;--k2:3;--k3:4}
+.i487125{--x:308;--y:325;--w:7;--h:8;--k1:2;--k2:3;--k3:4}
+.i4a02cf{--x:316;--y:325;--w:7;--h:8;--k1:2;--k2:3;--k3:4}
+.i547e90{--x:324;--y:325;--w:7;--h:8;--k1:2;--k2:3;--k3:4}
+.i55f9ff{--x:332;--y:325;--w:7;--h:8;--k1:2;--k2:3;--k3:4}
+.i587c0c{--x:340;--y:325;--w:7;--h:8;--k1:2;--k2:4;--k3:8}
+.i640a86{--x:348;--y:325;--w:7;--h:8;--k1:2;--k2:3;--k3:4}
+.i781f9f{--x:356;--y:325;--w:7;--h:8;--k1:2;--k2:3;--k3:4}
+.i7d580b{--x:364;--y:325;--w:7;--h:8;--k1:2;--k2:3;--k3:4}
+.i89d8a1{--x:372;--y:325;--w:7;--h:8;--k1:2;--k2:3;--k3:4}
+.i93d728{--x:380;--y:325;--w:7;--h:8;--k1:2;--k2:3;--k3:4}
+.i943fab{--x:388;--y:325;--w:7;--h:8;--k1:2;--k2:3;--k3:4}
+.i96d9be{--x:396;--y:325;--w:7;--h:8;--k1:2;--k2:3;--k3:4}
+.i9cc0d6{--x:404;--y:325;--w:7;--h:8;--k1:2;--k2:3;--k3:4}
+.iaaeaf2{--x:412;--y:325;--w:7;--h:8;--k1:2;--k2:3;--k3:4}
+.iabd2d9{--x:420;--y:325;--w:7;--h:8;--k1:2;--k2:3;--k3:4}
+.iafe6db{--x:428;--y:325;--w:7;--h:8;--k1:2;--k2:3;--k3:4}
+.ib1e712{--x:436;--y:325;--w:7;--h:8;--k1:2;--k2:3;--k3:4}
+.ib887e3{--x:444;--y:325;--w:7;--h:8;--k1:2;--k2:3;--k3:4}
+.ib9edce{--x:452;--y:325;--w:7;--h:8;--k1:2;--k2:3;--k3:4}
+.ic0bd68{--x:460;--y:325;--w:7;--h:8;--k1:2;--k2:3;--k3:4}
+.ic0cc11{--x:468;--y:325;--w:7;--h:8;--k1:2;--k2:3;--k3:4}
+.icc74f3{--x:476;--y:325;--w:7;--h:8;--k1:2;--k2:3;--k3:4}
+.ice324e{--x:484;--y:325;--w:7;--h:8;--k1:2;--k2:3;--k3:4}
+.ie09550{--x:492;--y:325;--w:7;--h:8;--k1:2;--k2:3;--k3:4}
+.ie10015{--x:500;--y:325;--w:7;--h:8;--k1:2;--k2:3;--k3:4}
+.ie6ef56{--x:0;--y:335;--w:7;--h:8;--k1:2;--k2:3;--k3:4}
+.ie705ff{--x:8;--y:335;--w:7;--h:8;--k1:2;--k2:3;--k3:4}
+.if4d4d2{--x:16;--y:335;--w:7;--h:8;--k1:2;--k2:3;--k3:4}
+.i5f9b04{--x:24;--y:335;--w:9;--h:7;--k1:2;--k2:4;--k3:7}
+.i51282b{--x:34;--y:335;--w:7;--h:7;--k1:2;--k2:5;--k3:9}
+.i5ae49d{--x:42;--y:335;--w:7;--h:7;--k1:2;--k2:5;--k3:9}
+.i86f6c4{--x:50;--y:335;--w:7;--h:7;--k1:2;--k2:5;--k3:9}
+.ia7baee{--x:58;--y:335;--w:7;--h:7;--k1:2;--k2:5;--k3:9}
+.ie9b539{--x:66;--y:335;--w:7;--h:7;--k1:1;--k2:2;--k3:2}
+.m.mo::before{content:"";display:inline-block;flex:none;width:14px;height:14px;background:url(atlas-1.png) -100px -670px/1020px 686px no-repeat;image-rendering:pixelated}
+.m.ma::before{content:"";display:inline-block;flex:none;width:14px;height:14px;background:url(atlas-1.png) -116px -670px/1020px 686px no-repeat;image-rendering:pixelated}
+.m.md::before{content:"";display:inline-block;flex:none;width:14px;height:14px;background:url(atlas-1.png) -84px -670px/1020px 686px no-repeat;image-rendering:pixelated}

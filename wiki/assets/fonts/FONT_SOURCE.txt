@@ -1,0 +1,5 @@
+wiki-head.woff2 is a glyph subset of MaoKenTangYuan-beta0.12-20210702.ttf (猫啃网糖圆体 0.12 beta),
+read from the game repository (datafiles/MaoKenTangYuan-beta0.12-20210702.ttf at commit 5795ce2ba).
+Licence: SIL Open Font License 1.1, full text and copyright notices in OFL.txt.
+As a Modified Version it is renamed "CoB Wiki Heading" and does not use the Reserved Font Names.
+Glyphs (720).
