@@ -5,4 +5,4 @@ Because the subset is a Modified Version, it is renamed "CoB Site Heading" and d
 the Reserved Font Names 'TangYuan', 'Tang Yuan', 'open huninn', 'huninn', 'Varela', 'Varela Round'.
 Not verified: the font's copyright notice says its Hanzi derive from Kosugi Maru (Apache-2.0);
 check with whoever cleared the font whether an Apache-2.0 notice must also be shipped.
-Glyphs (176):  &',./0123456789:?BCDEFHILMOPRSTVWXabcdefghijklmnopqrstuvwxy·×。一上下与中串了亲体作倒做公关冰出创到制包单去发号告咖哪啡啵喝回在境墙复夜天奶媒子客室小就工已店开手拍拿掉文料新日更木材来杯果柿梦液淇淋游照版物现田白的盖看着睡研种站素约群者节茶菜薯语调踩载迎进里重钓铁镇门闭闯面预鱼鲜鸡（），？
+Glyphs (172):  &',.0123456789?BCDEFILMOPRSTVWXabcdefghiklmnopqrstuvwxy·×。一上下与中串了亲体作倒做公关冰出创到制包单去发号告咖哪啡啵喝回在境墙复夜天奶媒子客室小就工已店开手拍拿掉文料新日更木材来杯果柿梦液淇淋游照版物现田白的盖看着睡研种站素约群者节茶菜薯语调踩载迎进里重钓铁镇门闭闯面预鱼鲜鸡（），？
