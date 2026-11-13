@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en" data-lang="en" data-time="day" data-assets="../assets/">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Call of Boba | Boba by day. Dreams by night.</title>
+<meta name="description" content="A cozy pixel-art life sim about saving a small-town milk tea shop. Now in Early Access on Steam.">
+<link rel="canonical" href="https://digimonlopmon.github.io/callofboba-site/en/">
+<link rel="alternate" hreflang="zh-CN" href="https://digimonlopmon.github.io/callofboba-site/">
+<link rel="alternate" hreflang="en" href="https://digimonlopmon.github.io/callofboba-site/en/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Call of Boba / 啵啵鸡物语">
+<meta property="og:title" content="Call of Boba — Boba by day. Dreams by night.">
+<meta property="og:description" content="A cozy pixel-art life sim about saving a small-town milk tea shop. Now in Early Access on Steam.">
+<meta property="og:url" content="https://digimonlopmon.github.io/callofboba-site/en/">
+<meta property="og:image" content="https://digimonlopmon.github.io/callofboba-site/assets/og/keyart_en.png">
+<meta property="og:image:width" content="1920">
+<meta property="og:image:height" content="1080">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="zh_CN">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="64x64" href="../assets/favicon-64.png">
+<link rel="apple-touch-icon" href="../assets/icon-192.png">
+<link rel="preload" href="../assets/fonts/cob-head.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../assets/css/sprites.css">
+<link rel="stylesheet" href="../assets/css/site.css">
+<script>
+(function(){var d=document.documentElement,t=null;try{t=localStorage.getItem('cob.time')}catch(e){}
+if(t!=='day'&&t!=='night'){var h=new Date().getHours();t=(h>=19||h<6)?'night':'day'}d.setAttribute('data-time',t);
+d.classList.add('js');})();
+</script>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="hud">
+  <div class="hud-clock" aria-hidden="true">
+    <span class="spr anim hud-tb" id="hud-tb"></span>
+    <span class="hud-text">
+      <span class="spr s-spr_hud_season" id="hud-season"></span>
+      <span class="hud-row2"><span class="spr s-spr_hud_week" id="hud-week"></span>
+      <span class="hud-time" id="hud-time"></span></span>
+    </span>
+  </div>
+  <div class="hud-right">
+    <a class="hud-lang" href="../" hreflang="zh-CN" lang="zh-CN">中文</a>
+    <a class="btn btn-sm btn-primary" href="https://store.steampowered.com/app/2342690/" rel="noopener" target="_blank" aria-label="View on Steam">Steam</a>
+  </div>
+</header>
+
+<canvas id="stars" aria-hidden="true"></canvas>
+
+<main id="main">
+  <section class="hero" id="top">
+    <div class="hero-text">
+      <h1 class="hero-title"><img class="logo" src="../assets/sprites/spr_title_logo.png" width="240" height="200" alt="Call of Boba"></h1>
+      <p class="tagline f-head"><span class="tg tg-day">Boba by day.</span> <span class="tg tg-night">Dreams by night.</span></p>
+      <p class="sub">A cozy pixel-art life sim about saving a small-town milk tea shop. Now in Early Access on Steam.</p>
+      <p class="cta"><a class="btn btn-primary btn-lg" href="https://store.steampowered.com/app/2342690/" rel="noopener" target="_blank">View on Steam</a></p>
+    </div>
+    <div class="hero-media">
+      <div class="clip textbox hero-clip" data-clip="hero_shop_en" id="hero-clip"><video muted loop playsinline preload="none" aria-hidden="true" tabindex="-1" width="1920" height="1080"></video></div>
+    </div>
+    <div class="lamp-wrap">
+      <span class="lamp-hint" id="lamp-hint">Switch off the lamp and sleep</span>
+      <button type="button" class="lamp" id="lamp" aria-labelledby="lamp-hint">
+        <span class="spr s-spr_myroom_lamp lamp-body"></span><span class="spr anim s-spr_myroom_lamp_light lamp-light"></span>
+      </button>
+      <span class="spr anim s-spr_NPC_sleeping_icon zzz" aria-hidden="true"></span>
+    </div>
+  </section>
+
+  <section class="sec story" aria-labelledby="story-h">
+    <h2 id="story-h" class="f-head">Come home to Tapioca Town</h2>
+    <div class="textbox story-box">
+      <p>Bobo worked himself into a hospital bed in the big city. He quit his job and caught the bus back to his hometown, Tapioca Town.</p><p>He&#x27;s barely off the bus when a tricycle sends him sprawling. The rider is Stellar, a childhood friend he hasn&#x27;t seen in years. Stellar&#x27;s grandpa left him a decades-old milk tea shop with cracking floorboards and books deep in the red. Everyone tells him to let it go.</p><p>So Bobo stays.</p>
+    </div>
+  </section>
+
+  <section class="sec play" aria-labelledby="play-h">
+    <h2 id="play-h" class="sr-only">What you do</h2>
+    <ul class="cards" id="cards">
+      <li class="card textbox" data-card="diy_drink" data-order="0"><div class="clip" data-clip="03_diy_drink_en" ><video muted loop playsinline preload="none" aria-hidden="true" tabindex="-1" width="1280" height="720"></video></div><h3 class="f-head">Mix it yourself</h3><p>Milk teas, foam teas, fruit teas, coffees. Over 50 recipes, and every cup is made by your own hands.</p></li><li class="card textbox" data-card="shop_service" data-order="1"><div class="clip" data-clip="04_shop_service_all" ><video muted loop playsinline preload="none" aria-hidden="true" tabindex="-1" width="1280" height="720"></video></div><h3 class="f-head">Open the doors</h3><p>Takeout customers are in a hurry. Dine-in guests care how the place looks. Set the tables, hire familiar faces from town, and bring Sheltered Lane back to life.</p></li><li class="card textbox" data-card="combat" data-order="2"><div class="clip" data-clip="05_combat_en" ><video muted loop playsinline preload="none" aria-hidden="true" tabindex="-1" width="1280" height="720"></video></div><h3 class="f-head">Fall asleep, fall into a dream</h3><p>Printers, security cameras, Mr. Stamp. Everything Bobo used to dread is waiting in Dreamland. Fire pearls, red beans, and tea right back at them, and bring home ingredients. Not tonight? Switch on the lamp and sleep till morning.</p></li><li class="card textbox" data-card="fishing" data-order="3"><div class="clip" data-clip="07_fishing_en" ><video muted loop playsinline preload="none" aria-hidden="true" tabindex="-1" width="1280" height="720"></video></div><h3 class="f-head">Fish to the beat</h3><p>Every fish is one part of a song. Hook a Fish King and the whole band plays.</p></li><li class="card textbox" data-card="farm_sprinklers" data-order="4"><div class="clip clip-px" data-clip="06_farm_sprinklers_all" ><video muted loop playsinline preload="none" aria-hidden="true" tabindex="-1" width="960" height="540"></video></div><h3 class="f-head">From the field to the cup</h3><p>31 crops across spring, summer, and fall. Grind and simmer your harvest into tomorrow&#x27;s toppings.</p></li><li class="card textbox" data-card="quest_birthday" data-order="5"><div class="clip" data-clip="08_quest_birthday_en" ><video muted loop playsinline preload="none" aria-hidden="true" tabindex="-1" width="1280" height="720"></video></div><h3 class="f-head">Life in town</h3><p>18 townsfolk keep their own routines. Learn their favorite gifts, and don&#x27;t forget their birthdays.</p></li>
+    </ul>
+  </section>
+
+  <section class="sec rnd" id="rnd" aria-labelledby="rnd-h">
+    <h2 id="rnd-h" class="f-head">R&amp;D Room · Mix one yourself</h2>
+    <p class="lead">Pick a few ingredients and see if you can make something from the menu.</p>
+    <div class="rnd-grid">
+      <div class="rnd-shelf" id="rnd-shelf">
+        <p class="rnd-showing" id="rnd-showing" hidden></p>
+        <h3 class="shelf-h f-head">Liquids</h3>
+        <div class="ing-row" id="shelf-liquid" role="group" aria-label="Liquids"></div>
+        <p class="rnd-note" id="rnd-note" role="status"></p>
+        <h3 class="shelf-h f-head">Toppings</h3>
+        <div class="ing-row" id="shelf-solid" role="group" aria-label="Toppings"></div>
+        <h3 class="shelf-h f-head">Ice</h3>
+        <div class="ing-row" id="shelf-ice" role="group" aria-label="Ice"></div>
+      </div>
+      <div class="rnd-station">
+        <div class="station-box">
+          <canvas id="cup" role="img" aria-label="Mixing station"></canvas>
+        </div>
+        <p class="sr-only" id="cup-status" aria-live="polite"></p>
+        <p class="rnd-actions">
+          <button type="button" class="btn btn-primary" id="serve" disabled>Serve</button>
+          <button type="button" class="btn" id="reset">Start over</button>
+        </p>
+        <div class="result textbox" id="result" aria-live="polite" hidden></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec wall" id="wall" aria-labelledby="wall-h">
+    <div class="wall-head">
+      <h2 id="wall-h" class="f-head">The menu wall</h2>
+      <p class="wall-count" id="wall-count"></p>
+    </div>
+    <p class="wall-dream" id="wall-dream">Some recipes only come back from Dreamland. Try switching off the lamp.</p>
+    <div class="wall-groups" id="wall-groups"></div>
+  </section>
+
+  <section class="sec status" aria-labelledby="status-h">
+    <div class="status-inner">
+      <div class="status-text">
+        <h2 id="status-h" class="f-head">Where we&#x27;re at</h2>
+        <p>Call of Boba is in Early Access on Steam, and it isn&#x27;t finished. The main story hasn&#x27;t reached its ending, and there&#x27;s no romance or festivals yet.</p><p>We&#x27;re Tomatoast, a core team of four. With so few hands, our pace is uneven. Every update is written up in our Steam news.</p>
+        <p><a class="btn" href="https://store.steampowered.com/news/app/2342690" rel="noopener" target="_blank">Read the update notes</a></p>
+      </div>
+      <span class="spr anim s-spr_NPC_0000_idle_down stellar" aria-hidden="true"></span>
+    </div>
+  </section>
+
+  <section class="sec community" aria-labelledby="community-h">
+    <h2 id="community-h" class="f-head"><span class="hearts" aria-hidden="true"><span class="spr s-spr_mainMenu_friendship_heart" style="--s:3"></span></span>Come say hi<span class="hearts" aria-hidden="true"><span class="spr s-spr_mainMenu_friendship_heart" style="--s:3"></span></span></h2>
+    <p>Chat, report bugs, or see what we&#x27;ve been working on.</p>
+    <ul class="comm-list">
+        <li class="comm-item"><a class="btn" href="https://discord.gg/BjjjtmRhcH" rel="noopener" target="_blank">Discord</a></li>
+        <li class="comm-item"><a class="btn" href="https://x.com/CallOfBoba" rel="noopener" target="_blank">X</a></li>
+        <li class="comm-item"><a class="btn" href="https://steamcommunity.com/app/2342690/discussions/0/" rel="noopener" target="_blank">Steam Community</a></li>
+    </ul>
+  </section>
+
+  <section class="sec press" aria-labelledby="press-h">
+    <h2 id="press-h" class="f-head">Press &amp; creators</h2>
+    <p>Writing about the game or making a video? Screenshots, logos, and clips are all here. Use them freely.</p>
+    <p class="press-actions"><a class="btn btn-primary" href="../assets/press/CallOfBoba_PressKit.zip" download>Download the press kit</a> <span class="press-size">(ZIP, 28.3 MB)</span></p>
+    <p class="press-contact">Contact: <a href="mailto:tomatoast@163.com">tomatoast@163.com</a></p>
+  </section>
+</main>
+
+<footer class="foot">
+  <p>© 2026 面包柿工作室 Tomatoast　·　Call of Boba / 啵啵鸡物语</p>
+  <p>Every pixel on this page comes from the game itself.</p>
+</footer>
+
+<canvas id="dream" aria-hidden="true"></canvas>
+<div class="bobo-day spr anim" id="bobo-day" aria-hidden="true"></div>
+<div class="dream-counter" id="dream-counter" hidden><span class="atl a-atlas_items" id="dream-counter-icon" aria-hidden="true"></span><span id="dream-counter-text"></span></div>
+<button type="button" class="lamp lamp-float" id="lamp-float" aria-labelledby="lamp-hint" hidden>
+  <span class="spr s-spr_myroom_lamp lamp-body"></span><span class="spr anim s-spr_myroom_lamp_light lamp-light"></span>
+</button>
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+<div class="fade" id="fade" aria-hidden="true"></div>
+
+<script type="application/json" id="i18n">{"name": "Call of Boba", "tagline_day": "Boba by day. ", "tagline_night": "Dreams by night.", "sub": "A cozy pixel-art life sim about saving a small-town milk tea shop. Now in Early Access on Steam.", "cta_steam": "View on Steam", "lang_switch": "中文", "story_h": "Come home to Tapioca Town", "status_h": "Where we're at", "status_btn": "Read the update notes", "community_h": "Come say hi", "community_lead": "Chat, report bugs, or see what we've been working on.", "discord": "Discord", "x": "X", "steam_community": "Steam Community", "press_h": "Press & creators", "press_lead": "Writing about the game or making a video? Screenshots, logos, and clips are all here. Use them freely.", "press_btn": "Download the press kit", "press_contact": "Contact: ", "press_email": "tomatoast@163.com", "footer": "© 2026 面包柿工作室 Tomatoast　·　Call of Boba / 啵啵鸡物语", "footer_pixels": "Every pixel on this page comes from the game itself.", "tab_away": "Bobo dozed off… Zzz", "rnd_h": "R&D Room · Mix one yourself", "rnd_lead": "Pick a few ingredients and see if you can make something from the menu.", "serve": "Serve", "reset": "Start over", "ok": "That's a {name}, straight off our menu.", "fail": "Bobo's never tasted anything like this…", "near_missing": "So close to {name}. It's missing {x}.", "near_extra": "So close to {name}. It has {x} it shouldn't.", "wall_h": "The menu wall", "wall_count": "{n} / {total} discovered", "wall_dream": "Some recipes only come back from Dreamland. Try switching off the lamp.", "skip": "Skip to content", "steam_short": "Steam", "play_h": "What you do", "group_liquid": "Liquids", "group_solid": "Toppings", "group_ice": "Ice", "ice": "Ice", "liquid_max": "Three liquids at most.", "cup_empty": "The cup is empty.", "cup_has": "In the cup: {list}", "station": "Mixing station", "price": "Sells for {n}", "show_me": "Show me", "showing": "Showing you: {name}", "unknown": "Not discovered yet", "made": "made it", "close": "Close", "zip": "ZIP, {size}", "list_sep": ", ", "lamp_day": "Switch off the lamp and sleep", "lamp_night": "Not tonight? Switch on the lamp", "dream_counter": "Ingredients ×{n}", "dream_recipe": "Brought back a new recipe: {name}", "dream_end": "Bobo woke up. He brought back {n} ingredients tonight.", "cat_MilkTea": "Milk Tea", "cat_MilkFoamTea": "Foam Tea", "cat_FreshFruit": "Fruit Tea", "cat_Coffee": "Coffee", "cat_TeaLatte": "Tea Latte", "cat_Ice_cream": "Ice Cream", "lang": "en", "clip_day": "hero_shop_en", "clip_night": "05_combat_en", "stamp": "spr_boss_stamp_crack", "clips": {"hero_shop_en": {"poster": "posters/hero_shop_en.jpg", "mp4": "video/hero_shop_en.mp4", "pixel": false}, "05_combat_en": {"poster": "posters/05_combat_en.jpg", "mp4": "video/05_combat_en.mp4", "webm": "video/05_combat_en.webm", "pixel": false}, "03_diy_drink_en": {"poster": "posters/03_diy_drink_en.jpg", "mp4": "video/03_diy_drink_en.mp4", "webm": "video/03_diy_drink_en.webm", "pixel": false}, "04_shop_service_all": {"poster": "posters/04_shop_service_all.jpg", "mp4": "video/04_shop_service_all.mp4", "webm": "video/04_shop_service_all.webm", "pixel": false}, "07_fishing_en": {"poster": "posters/07_fishing_en.jpg", "mp4": "video/07_fishing_en.mp4", "webm": "video/07_fishing_en.webm", "pixel": false}, "06_farm_sprinklers_all": {"poster": "posters/06_farm_sprinklers_all.png", "mp4": "video/06_farm_sprinklers_all.mp4", "webm": "video/06_farm_sprinklers_all.webm", "pixel": true}, "08_quest_birthday_en": {"poster": "posters/08_quest_birthday_en.jpg", "mp4": "video/08_quest_birthday_en.mp4", "webm": "video/08_quest_birthday_en.webm", "pixel": false}}}</script>
+<script src="../assets/js/matcher.js" defer></script>
+<script src="../assets/js/site.js" defer></script>
+<script src="../assets/js/dream.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="zh-CN" data-lang="zh" data-time="day" data-assets="assets/">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>啵啵鸡物语 Call of Boba｜白天开奶茶店，夜里闯梦境。</title>
+<meta name="description" content="一家老奶茶店，一段木薯镇的小日子。像素风小镇生活游戏，Steam 抢先体验中。">
+<link rel="canonical" href="https://digimonlopmon.github.io/callofboba-site/">
+<link rel="alternate" hreflang="zh-CN" href="https://digimonlopmon.github.io/callofboba-site/">
+<link rel="alternate" hreflang="en" href="https://digimonlopmon.github.io/callofboba-site/en/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Call of Boba / 啵啵鸡物语">
+<meta property="og:title" content="啵啵鸡物语 — 白天开奶茶店，夜里闯梦境。">
+<meta property="og:description" content="一家老奶茶店，一段木薯镇的小日子。像素风小镇生活游戏，Steam 抢先体验中。">
+<meta property="og:url" content="https://digimonlopmon.github.io/callofboba-site/">
+<meta property="og:image" content="https://digimonlopmon.github.io/callofboba-site/assets/og/keyart_zh.png">
+<meta property="og:image:width" content="1920">
+<meta property="og:image:height" content="1080">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:locale:alternate" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+<link rel="icon" type="image/png" sizes="64x64" href="assets/favicon-64.png">
+<link rel="apple-touch-icon" href="assets/icon-192.png">
+<link rel="preload" href="assets/fonts/cob-head.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="assets/css/sprites.css">
+<link rel="stylesheet" href="assets/css/site.css">
+<script>
+(function(){var d=document.documentElement,t=null;try{t=localStorage.getItem('cob.time')}catch(e){}
+if(t!=='day'&&t!=='night'){var h=new Date().getHours();t=(h>=19||h<6)?'night':'day'}d.setAttribute('data-time',t);
+d.classList.add('js');})();
+</script>
+</head>
+<body>
+<a class="skip" href="#main">跳到正文</a>
+
+<header class="hud">
+  <div class="hud-clock" aria-hidden="true">
+    <span class="spr anim hud-tb" id="hud-tb"></span>
+    <span class="hud-text">
+      <span class="spr s-spr_hud_season" id="hud-season"></span>
+      <span class="hud-row2"><span class="spr s-spr_hud_week" id="hud-week"></span>
+      <span class="hud-time" id="hud-time"></span></span>
+    </span>
+  </div>
+  <div class="hud-right">
+    <a class="hud-lang" href="en/" hreflang="en" lang="en">English</a>
+    <a class="btn btn-sm btn-primary" href="https://store.steampowered.com/app/2342690/" rel="noopener" target="_blank" aria-label="去 Steam 看看">Steam</a>
+  </div>
+</header>
+
+<canvas id="stars" aria-hidden="true"></canvas>
+
+<main id="main">
+  <section class="hero" id="top">
+    <div class="hero-text">
+      <h1 class="hero-title"><img class="logo" src="assets/sprites/spr_title_logo.png" width="240" height="200" alt="Call of Boba"><span class="f-head h1-name">啵啵鸡物语</span></h1>
+      <p class="tagline f-head"><span class="tg tg-day">白天开奶茶店，</span><span class="tg tg-night">夜里闯梦境。</span></p>
+      <p class="sub">一家老奶茶店，一段木薯镇的小日子。像素风小镇生活游戏，Steam 抢先体验中。</p>
+      <p class="cta"><a class="btn btn-primary btn-lg" href="https://store.steampowered.com/app/2342690/" rel="noopener" target="_blank">去 Steam 看看</a> <a class="btn btn-alt" href="https://www.taptap.cn/app/321376" rel="noopener" target="_blank">手游版预约（TapTap）</a></p>
+    </div>
+    <div class="hero-media">
+      <div class="clip textbox hero-clip" data-clip="hero_shop_zh" id="hero-clip"><video muted loop playsinline preload="none" aria-hidden="true" tabindex="-1" width="1920" height="1080"></video></div>
+    </div>
+    <div class="lamp-wrap">
+      <span class="lamp-hint" id="lamp-hint">关灯睡觉</span>
+      <button type="button" class="lamp" id="lamp" aria-labelledby="lamp-hint">
+        <span class="spr s-spr_myroom_lamp lamp-body"></span><span class="spr anim s-spr_myroom_lamp_light lamp-light"></span>
+      </button>
+      <span class="spr anim s-spr_NPC_sleeping_icon zzz" aria-hidden="true"></span>
+    </div>
+  </section>
+
+  <section class="sec story" aria-labelledby="story-h">
+    <h2 id="story-h" class="f-head">回到木薯镇</h2>
+    <div class="textbox story-box">
+      <p>啵啵在大城市拼命加班，再睁眼时已经躺在医院里。他辞了职，坐上了回家乡木薯镇的车。</p><p>刚下车，就被一辆三蹦子吓得摔了一跤。骑车的，是多年没见的发小恒星。恒星的爷爷留下一家开了几十年的奶茶店，地板一踩就裂，账上早就入不敷出，谁都劝他放手。</p><p>啵啵留了下来。</p>
+    </div>
+  </section>
+
+  <section class="sec play" aria-labelledby="play-h">
+    <h2 id="play-h" class="sr-only">玩法</h2>
+    <ul class="cards" id="cards">
+      <li class="card textbox" data-card="diy_drink" data-order="0"><div class="clip" data-clip="03_diy_drink_zh" ><video muted loop playsinline preload="none" aria-hidden="true" tabindex="-1" width="1280" height="720"></video></div><h3 class="f-head">亲手调一杯</h3><p>奶茶、奶盖茶、鲜果茶、咖啡，50 多款配方。加什么料、加多少，都靠你自己的手。</p></li><li class="card textbox" data-card="shop_service" data-order="1"><div class="clip" data-clip="04_shop_service_all" ><video muted loop playsinline preload="none" aria-hidden="true" tabindex="-1" width="1280" height="720"></video></div><h3 class="f-head">开门迎客</h3><p>外带的客人赶时间，堂食的客人挑环境。摆好桌椅，雇上镇里的熟面孔，让避雨巷重新热闹起来。</p></li><li class="card textbox" data-card="combat" data-order="2"><div class="clip" data-clip="05_combat_zh" ><video muted loop playsinline preload="none" aria-hidden="true" tabindex="-1" width="1280" height="720"></video></div><h3 class="f-head">一睡着就掉进梦里</h3><p>打印机、摄像头、盖章先生，啵啵怕过的东西都在梦里等着。拿珍珠、红豆和茶当弹药打回去，顺手带点原料回来。今晚不想打？点亮台灯，一觉睡到天亮。</p></li><li class="card textbox" data-card="fishing" data-order="3"><div class="clip" data-clip="07_fishing_zh" ><video muted loop playsinline preload="none" aria-hidden="true" tabindex="-1" width="1280" height="720"></video></div><h3 class="f-head">踩着节拍钓鱼</h3><p>每条鱼都是曲子里的一个声部。钓上鱼王的时候，整首歌才会完整响起来。</p></li><li class="card textbox" data-card="farm_sprinklers" data-order="4"><div class="clip clip-px" data-clip="06_farm_sprinklers_all" ><video muted loop playsinline preload="none" aria-hidden="true" tabindex="-1" width="960" height="540"></video></div><h3 class="f-head">田里种的，杯里喝的</h3><p>春、夏、秋三季，31 种作物。收成磨一磨、煮一煮，就是明天店里的小料。</p></li><li class="card textbox" data-card="quest_birthday" data-order="5"><div class="clip" data-clip="08_quest_birthday_zh" ><video muted loop playsinline preload="none" aria-hidden="true" tabindex="-1" width="1280" height="720"></video></div><h3 class="f-head">镇上的日子</h3><p>18 位居民各过各的日子。记住他们爱收什么礼物，也别忘了生日。</p></li>
+    </ul>
+  </section>
+
+  <section class="sec rnd" id="rnd" aria-labelledby="rnd-h">
+    <h2 id="rnd-h" class="f-head">研发室 · 亲手调一杯</h2>
+    <p class="lead">挑几样原料，看看能不能调出店里的饮品。</p>
+    <div class="rnd-grid">
+      <div class="rnd-shelf" id="rnd-shelf">
+        <p class="rnd-showing" id="rnd-showing" hidden></p>
+        <h3 class="shelf-h f-head">液体</h3>
+        <div class="ing-row" id="shelf-liquid" role="group" aria-label="液体"></div>
+        <p class="rnd-note" id="rnd-note" role="status"></p>
+        <h3 class="shelf-h f-head">小料</h3>
+        <div class="ing-row" id="shelf-solid" role="group" aria-label="小料"></div>
+        <h3 class="shelf-h f-head">冰</h3>
+        <div class="ing-row" id="shelf-ice" role="group" aria-label="冰"></div>
+      </div>
+      <div class="rnd-station">
+        <div class="station-box">
+          <canvas id="cup" role="img" aria-label="调饮台"></canvas>
+        </div>
+        <p class="sr-only" id="cup-status" aria-live="polite"></p>
+        <p class="rnd-actions">
+          <button type="button" class="btn btn-primary" id="serve" disabled>出杯</button>
+          <button type="button" class="btn" id="reset">倒掉重来</button>
+        </p>
+        <div class="result textbox" id="result" aria-live="polite" hidden></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec wall" id="wall" aria-labelledby="wall-h">
+    <div class="wall-head">
+      <h2 id="wall-h" class="f-head">菜单墙</h2>
+      <p class="wall-count" id="wall-count"></p>
+    </div>
+    <p class="wall-dream" id="wall-dream">有些配方要从梦里带回来。关灯试试。</p>
+    <div class="wall-groups" id="wall-groups"></div>
+  </section>
+
+  <section class="sec status" aria-labelledby="status-h">
+    <div class="status-inner">
+      <div class="status-text">
+        <h2 id="status-h" class="f-head">现在做到哪了</h2>
+        <p>《啵啵鸡物语》正在 Steam 抢先体验，还没做完：主线故事还没到结局，恋爱和节日也都还没有。</p><p>我们是面包柿工作室，核心团队 4 个人。人少，更新有快有慢。每次更新改了什么，都写在 Steam 公告里。</p>
+        <p><a class="btn" href="https://store.steampowered.com/news/app/2342690" rel="noopener" target="_blank">看更新公告</a></p>
+      </div>
+      <span class="spr anim s-spr_NPC_0000_idle_down stellar" aria-hidden="true"></span>
+    </div>
+  </section>
+
+  <section class="sec community" aria-labelledby="community-h">
+    <h2 id="community-h" class="f-head"><span class="hearts" aria-hidden="true"><span class="spr s-spr_mainMenu_friendship_heart" style="--s:3"></span></span>来木薯镇串门<span class="hearts" aria-hidden="true"><span class="spr s-spr_mainMenu_friendship_heart" style="--s:3"></span></span></h2>
+    <p>想聊天、报 BUG、看我们最近在忙什么，都来这儿。</p>
+    <ul class="comm-list">
+        <li class="comm-item comm-qq"><span class="comm-name">QQ 群 1001753710</span>
+          <button type="button" class="btn btn-sm" id="qq-copy" data-qq="1001753710" data-done="已复制">复制群号</button>
+          <span class="sr-only" id="qq-status" aria-live="polite"></span></li>
+        <li class="comm-item"><a class="btn" href="https://space.bilibili.com/3493274989890414" rel="noopener" target="_blank">B站 面包柿工作室</a></li>
+        <li class="comm-item"><a class="btn" href="https://www.taptap.cn/app/321376" rel="noopener" target="_blank">TapTap</a></li>
+        <li class="comm-item"><a class="btn" href="https://discord.gg/BjjjtmRhcH" rel="noopener" target="_blank">Discord</a></li>
+        <li class="comm-item"><a class="btn" href="https://x.com/CallOfBoba" rel="noopener" target="_blank">X</a></li>
+    </ul>
+  </section>
+
+  <section class="sec press" aria-labelledby="press-h">
+    <h2 id="press-h" class="f-head">媒体与创作者</h2>
+    <p>想写一写、录一录这款游戏？截图、Logo 和动图都在这儿，直接用就行。</p>
+    <p class="press-actions"><a class="btn btn-primary" href="assets/press/CallOfBoba_PressKit.zip" download>下载素材包</a> <span class="press-size">（ZIP，28.3 MB）</span></p>
+    <p class="press-contact">联系我们：<a href="mailto:tomatoast@163.com">tomatoast@163.com</a></p>
+  </section>
+</main>
+
+<footer class="foot">
+  <p>© 2026 面包柿工作室 Tomatoast　·　Call of Boba / 啵啵鸡物语</p>
+  <p>页面里的像素画面都来自游戏本身。</p>
+</footer>
+
+<canvas id="dream" aria-hidden="true"></canvas>
+<div class="bobo-day spr anim" id="bobo-day" aria-hidden="true"></div>
+<div class="dream-counter" id="dream-counter" hidden><span class="atl a-atlas_items" id="dream-counter-icon" aria-hidden="true"></span><span id="dream-counter-text"></span></div>
+<button type="button" class="lamp lamp-float" id="lamp-float" aria-labelledby="lamp-hint" hidden>
+  <span class="spr s-spr_myroom_lamp lamp-body"></span><span class="spr anim s-spr_myroom_lamp_light lamp-light"></span>
+</button>
+<div class="toasts" id="toasts" role="status" aria-live="polite"></div>
+<div class="fade" id="fade" aria-hidden="true"></div>
+
+<script type="application/json" id="i18n">{"name": "啵啵鸡物语", "tagline_day": "白天开奶茶店，", "tagline_night": "夜里闯梦境。", "sub": "一家老奶茶店，一段木薯镇的小日子。像素风小镇生活游戏，Steam 抢先体验中。", "cta_steam": "去 Steam 看看", "cta_taptap": "手游版预约（TapTap）", "lang_switch": "English", "story_h": "回到木薯镇", "status_h": "现在做到哪了", "status_btn": "看更新公告", "community_h": "来木薯镇串门", "community_lead": "想聊天、报 BUG、看我们最近在忙什么，都来这儿。", "qq_label": "QQ 群 1001753710", "qq_copy": "复制群号", "qq_copied": "已复制", "bilibili": "B站 面包柿工作室", "taptap": "TapTap", "discord": "Discord", "x": "X", "press_h": "媒体与创作者", "press_lead": "想写一写、录一录这款游戏？截图、Logo 和动图都在这儿，直接用就行。", "press_btn": "下载素材包", "press_contact": "联系我们：", "press_email": "tomatoast@163.com", "footer": "© 2026 面包柿工作室 Tomatoast　·　Call of Boba / 啵啵鸡物语", "footer_pixels": "页面里的像素画面都来自游戏本身。", "lamp_day": "关灯睡觉", "lamp_night": "今晚不想打？开灯", "tab_away": "啵啵睡着了… Zzz", "rnd_h": "研发室 · 亲手调一杯", "rnd_lead": "挑几样原料，看看能不能调出店里的饮品。", "serve": "出杯", "reset": "倒掉重来", "ok": "这是店里的「{name}」。", "fail": "啵啵没喝过这种……", "near_missing": "差一点就是「{name}」：少了{x}。", "near_extra": "差一点就是「{name}」：多了{x}。", "wall_h": "菜单墙", "wall_count": "已认识 {n} / {total}", "wall_dream": "有些配方要从梦里带回来。关灯试试。", "dream_counter": "带回原料 ×{n}", "dream_recipe": "带回了新配方：{name}", "dream_end": "啵啵醒了。今晚带回 {n} 份原料。", "cat_MilkTea": "奶茶", "cat_MilkFoamTea": "奶盖茶", "cat_FreshFruit": "鲜果茶", "cat_Coffee": "咖啡", "cat_TeaLatte": "茶拿铁", "cat_Ice_cream": "冰淇淋", "skip": "跳到正文", "steam_short": "Steam", "play_h": "玩法", "group_liquid": "液体", "group_solid": "小料", "group_ice": "冰", "ice": "冰块", "liquid_max": "最多放三种液体。", "cup_empty": "杯子是空的。", "cup_has": "杯里：{list}", "station": "调饮台", "price": "售价 {n}", "show_me": "照着调", "showing": "照着调：「{name}」", "unknown": "还没认识的配方", "made": "调出过", "close": "关闭", "zip": "ZIP，{size}", "list_sep": "、", "lang": "zh", "clip_day": "hero_shop_zh", "clip_night": "05_combat_zh", "stamp": "spr_boss_stamp_crack_chineseOnly", "clips": {"hero_shop_zh": {"poster": "posters/hero_shop_zh.jpg", "mp4": "video/hero_shop_zh.mp4", "pixel": false}, "05_combat_zh": {"poster": "posters/05_combat_zh.jpg", "mp4": "video/05_combat_zh.mp4", "webm": "video/05_combat_zh.webm", "pixel": false}, "03_diy_drink_zh": {"poster": "posters/03_diy_drink_zh.jpg", "mp4": "video/03_diy_drink_zh.mp4", "webm": "video/03_diy_drink_zh.webm", "pixel": false}, "04_shop_service_all": {"poster": "posters/04_shop_service_all.jpg", "mp4": "video/04_shop_service_all.mp4", "webm": "video/04_shop_service_all.webm", "pixel": false}, "07_fishing_zh": {"poster": "posters/07_fishing_zh.jpg", "mp4": "video/07_fishing_zh.mp4", "webm": "video/07_fishing_zh.webm", "pixel": false}, "06_farm_sprinklers_all": {"poster": "posters/06_farm_sprinklers_all.png", "mp4": "video/06_farm_sprinklers_all.mp4", "webm": "video/06_farm_sprinklers_all.webm", "pixel": true}, "08_quest_birthday_zh": {"poster": "posters/08_quest_birthday_zh.jpg", "mp4": "video/08_quest_birthday_zh.mp4", "webm": "video/08_quest_birthday_zh.webm", "pixel": false}}}</script>
+<script src="assets/js/matcher.js" defer></script>
+<script src="assets/js/site.js" defer></script>
+<script src="assets/js/dream.js" defer></script>
+</body>
+</html>
